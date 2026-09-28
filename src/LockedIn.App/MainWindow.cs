@@ -16,9 +16,9 @@ internal sealed partial class MainWindow : Form
 
     // Match --bg, --text and --border in site.css so the title bar blends into the dashboard header.
     private static readonly (Color Background, Color Text, Color Border) LightTheme =
-        (ColorTranslator.FromHtml("#f3f4fb"), ColorTranslator.FromHtml("#171a33"), ColorTranslator.FromHtml("#e2e4f1"));
+        (ColorTranslator.FromHtml("#f5f5f7"), ColorTranslator.FromHtml("#1d1d1f"), ColorTranslator.FromHtml("#e5e5ea"));
     private static readonly (Color Background, Color Text, Color Border) DarkTheme =
-        (ColorTranslator.FromHtml("#0f1226"), ColorTranslator.FromHtml("#e9eaf5"), ColorTranslator.FromHtml("#272c52"));
+        (ColorTranslator.FromHtml("#000000"), ColorTranslator.FromHtml("#f5f5f7"), ColorTranslator.FromHtml("#1c1c1e"));
 
     private const int DwmwaUseImmersiveDarkMode = 20;
     private const int DwmwaWindowCornerPreference = 33;

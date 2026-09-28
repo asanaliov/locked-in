@@ -48,7 +48,7 @@ public sealed class GeneralSettingsService(IConfiguration configuration, IOption
                 ["Appearance"] = new JsonObject
                 {
                     ["Theme"] = (Enum.IsDefined(settings.Theme) ? settings.Theme : Theme.System).ToString(),
-                    ["Accent"] = (Enum.IsDefined(settings.Accent) ? settings.Accent : Accent.Indigo).ToString(),
+                    ["Accent"] = (Enum.IsDefined(settings.Accent) ? settings.Accent : Accent.Blue).ToString(),
                     ["Animations"] = settings.Animations,
                 },
                 ["Tracker"] = new JsonObject

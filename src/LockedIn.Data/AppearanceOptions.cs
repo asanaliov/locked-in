@@ -9,9 +9,9 @@ public enum Theme
 
 public enum Accent
 {
-    Indigo,
-    Sky,
-    Orchid,
+    Blue,
+    Graphite,
+    Orange,
 }
 
 /// <summary>How the dashboard and window look. Shared by the dashboard and the app window's title bar.</summary>
