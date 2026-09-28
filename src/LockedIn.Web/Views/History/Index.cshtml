@@ -50,14 +50,17 @@
     const hoursBar = (label, key) => ({
         type: 'bar', label, data: days.map(d => d[key]),
         backgroundColor: categoryColors[label], stack: 'hours', yAxisID: 'hours',
+        borderRadius: 4, barPercentage: 0.55,
     });
+    const accent = css.getPropertyValue('--accent').trim();
     new Chart(document.getElementById('week'), {
         data: {
             labels: days.map(d => d.label),
             datasets: [
                 {
                     type: 'line', label: 'Score', data: days.map(d => d.score), yAxisID: 'score',
-                    borderColor: css.getPropertyValue('--accent').trim(), tension: 0.3,
+                    borderColor: accent, backgroundColor: accent, borderWidth: 3, tension: 0.35,
+                    pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: css.getPropertyValue('--card').trim(),
                 },
                 hoursBar('Focus', 'focus'),
                 hoursBar('Neutral', 'neutral'),
@@ -70,7 +73,7 @@
             scales: {
                 hours: { stacked: true, position: 'left', title: { display: true, text: 'hours' } },
                 score: { position: 'right', min: 0, max: 100, grid: { display: false }, title: { display: true, text: 'score' } },
-                x: { stacked: true },
+                x: { stacked: true, grid: { display: false } },
             },
         },
     });
