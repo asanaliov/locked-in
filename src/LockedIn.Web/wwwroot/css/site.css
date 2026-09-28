@@ -191,6 +191,18 @@ a:focus-visible, select:focus-visible, button:focus-visible {
 .Neutral { background: var(--neutral); }
 .Distraction { background: var(--distraction); }
 
+.stage-name { margin: -0.5rem 0 1rem; font-family: var(--font-display); font-size: 1.6rem; font-weight: 650; letter-spacing: -0.02em; }
+.stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+.stage { display: flex; flex-direction: column; gap: 0.2rem; opacity: 0.45; filter: grayscale(0.7); transition: opacity 200ms, filter 200ms; }
+.stage:hover { opacity: 0.8; filter: none; }
+.stage img { width: 100%; aspect-ratio: 264 / 185; border-radius: 12px; border: 2px solid transparent; margin-bottom: 0.35rem; }
+.stage.current { opacity: 1; filter: none; }
+.stage.current img { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); animation: fade-up 500ms 200ms var(--ease) both; }
+.stage-label { font-size: 0.9rem; font-weight: 600; }
+.stage-range { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stage-chip { display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
+.stage-chip img { width: 36px; height: 25px; object-fit: cover; border-radius: 6px; }
+
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--border); }
 tbody tr:last-child td { border-bottom: none; }
@@ -232,10 +244,14 @@ code { font-size: 0.9em; padding: 0.1em 0.35em; border-radius: 4px; background: 
 
 .muted { color: var(--muted); }
 .empty { color: var(--muted); text-align: center; padding: 2.5rem; }
+.empty img { display: block; width: min(100%, 420px); margin: 0 auto 1.5rem; border-radius: 12px; animation: fade-up 500ms var(--ease) both; }
+.empty p { margin: 0 auto; max-width: 42ch; }
+.empty .empty-title { margin-bottom: 0.35rem; color: var(--text); font-family: var(--font-display); font-size: 1.25rem; font-weight: 650; }
 
 @media (max-width: 640px) {
     .hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
     .stats { width: 100%; }
+    .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
