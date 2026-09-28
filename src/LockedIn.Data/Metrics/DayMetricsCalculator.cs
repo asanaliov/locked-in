@@ -31,9 +31,13 @@ public static class DayMetricsCalculator
     private static IReadOnlyList<AppUsage> TimePerApp(IEnumerable<UsageSession> sessions) =>
         sessions
             .GroupBy(s => s.AppName)
-            .Select(g => new AppUsage(g.Key, g.Last().Category, Sum(g)))
+            .Select(g => new AppUsage(g.Key, DominantCategory(g), Sum(g)))
             .OrderByDescending(a => a.Time)
             .ToList();
+
+    /// <summary>A browser can be both Focus and Distraction; show it as whatever it was most of the time.</summary>
+    private static Category DominantCategory(IEnumerable<UsageSession> sessions) =>
+        sessions.GroupBy(s => s.Category).MaxBy(g => Sum(g))!.Key;
 
     private static TimeSpan Sum(IEnumerable<UsageSession> sessions) =>
         sessions.Aggregate(TimeSpan.Zero, (total, s) => total + s.Duration);

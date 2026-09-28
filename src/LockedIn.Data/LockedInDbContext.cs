@@ -1,3 +1,4 @@
+using LockedIn.Data.Classification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -6,6 +7,7 @@ namespace LockedIn.Data;
 public sealed class LockedInDbContext(DbContextOptions<LockedInDbContext> options) : DbContext(options)
 {
     public DbSet<UsageSession> UsageSessions => Set<UsageSession>();
+    public DbSet<AppCategoryOverride> CategoryOverrides => Set<AppCategoryOverride>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -15,6 +17,11 @@ public sealed class LockedInDbContext(DbContextOptions<LockedInDbContext> option
         session.Property(s => s.Category).HasConversion<string>().HasMaxLength(16);
         session.Ignore(s => s.Duration);
         session.HasIndex(s => s.StartTime);
+
+        var categoryOverride = modelBuilder.Entity<AppCategoryOverride>();
+        categoryOverride.HasKey(o => o.AppName);
+        categoryOverride.Property(o => o.AppName).HasMaxLength(260).UseCollation("NOCASE");
+        categoryOverride.Property(o => o.Category).HasConversion<string>().HasMaxLength(16);
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

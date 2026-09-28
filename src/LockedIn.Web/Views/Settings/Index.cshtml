@@ -1,0 +1,40 @@
+@model IReadOnlyList<AppCategoryRow>
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<h1>App categories</h1>
+<p class="muted">
+    Changing a category also updates that app's past sessions. Browsers are classified per tab title
+    using the keywords in <code>lockedin.json</code>; their override only applies when no keyword matches.
+</p>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>App</th><th>Default</th><th>Category</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model)
+            {
+                <tr>
+                    <td>@app.AppName @if (app.IsBrowser) { <span class="muted">(browser)</span> }</td>
+                    <td class="muted">@app.DefaultCategory</td>
+                    <td>
+                        <form asp-action="SetCategory" method="post">
+                            <input type="hidden" name="appName" value="@app.AppName" />
+                            <span class="dot @app.Effective"></span>
+                            <select name="category" onchange="this.form.submit()">
+                                <option value="" selected="@(app.Override is null)">Default (@app.DefaultCategory)</option>
+                                @foreach (var category in Enum.GetValues<Category>())
+                                {
+                                    <option value="@category" selected="@(app.Override == category)">@category</option>
+                                }
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

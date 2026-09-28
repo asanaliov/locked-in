@@ -1,0 +1,21 @@
+@model DayMetrics
+@{
+    var parts = new[]
+    {
+        (Name: nameof(Category.Focus), Time: Model.FocusTime),
+        (Name: nameof(Category.Neutral), Time: Model.NeutralTime),
+        (Name: nameof(Category.Distraction), Time: Model.DistractionTime),
+    };
+}
+<div class="breakdown">
+    @foreach (var part in parts.Where(p => p.Time > TimeSpan.Zero))
+    {
+        <span class="@part.Name" style="width: @((part.Time / Model.ActiveTime * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></span>
+    }
+</div>
+<div class="legend">
+    @foreach (var part in parts)
+    {
+        <span><span class="dot @part.Name"></span>@part.Name <strong>@Format.Duration(part.Time)</strong></span>
+    }
+</div>

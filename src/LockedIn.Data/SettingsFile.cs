@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace LockedIn.Data;
 
@@ -7,6 +8,15 @@ public static class SettingsFile
 {
     public const string SectionName = "LockedIn";
 
-    public static IConfigurationBuilder AddLockedInSettings(this IConfigurationBuilder configuration) =>
-        configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "lockedin.json"), optional: false);
+    /// <summary>
+    /// Adds lockedin.json as the lowest-priority source, so appsettings.json,
+    /// environment variables (e.g. LockedIn__DatabasePath) and the command line can override it.
+    /// </summary>
+    public static IConfigurationBuilder AddLockedInSettings(this IConfigurationBuilder configuration)
+    {
+        var source = new JsonConfigurationSource { Path = Path.Combine(AppContext.BaseDirectory, "lockedin.json") };
+        source.ResolveFileProvider();
+        configuration.Sources.Insert(0, source);
+        return configuration;
+    }
 }

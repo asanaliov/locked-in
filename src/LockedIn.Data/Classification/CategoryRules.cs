@@ -11,4 +11,6 @@ public sealed class CategoryRules
     public Dictionary<string, Category> Apps { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     public Dictionary<string, Category> TitleKeywords { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public Category DefaultFor(string appName) => Apps.GetValueOrDefault(appName, Category.Neutral);
 }

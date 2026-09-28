@@ -5,14 +5,23 @@ public interface IAppClassifier
     Category Classify(string appName, string windowTitle);
 }
 
-public sealed class AppClassifier(CategoryRules rules) : IAppClassifier
+public interface ICategoryOverrides
+{
+    Category? Find(string appName);
+}
+
+/// <summary>
+/// Browser title keywords win first (a YouTube tab is a distraction whatever the browser's category),
+/// then Settings page overrides, then lockedin.json app rules. Unknown apps are Neutral.
+/// </summary>
+public sealed class AppClassifier(CategoryRules rules, ICategoryOverrides overrides) : IAppClassifier
 {
     public Category Classify(string appName, string windowTitle)
     {
         if (rules.Browsers.Contains(appName) && MatchTitleKeyword(windowTitle) is { } fromTitle)
             return fromTitle;
 
-        return rules.Apps.GetValueOrDefault(appName, Category.Neutral);
+        return overrides.Find(appName) ?? rules.DefaultFor(appName);
     }
 
     private Category? MatchTitleKeyword(string windowTitle)

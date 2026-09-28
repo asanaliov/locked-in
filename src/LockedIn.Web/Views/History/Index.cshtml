@@ -1,0 +1,77 @@
+@model IReadOnlyList<DaySummary>
+@{
+    ViewData["Title"] = "Last 7 days";
+}
+
+<h1>Last 7 days</h1>
+
+<div class="card">
+    <h2>Active hours and Locked-In Score</h2>
+    <div style="height: 320px"><canvas id="week"></canvas></div>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th class="num">Score</th>
+                <th class="num">Active</th>
+                <th class="num">Focus</th>
+                <th class="num">Distraction</th>
+                <th class="num">Longest streak</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var day in Model.Reverse())
+            {
+                <tr>
+                    <td>@day.Day.ToString("ddd d MMM")</td>
+                    <td class="num"><strong>@day.Metrics.Score</strong></td>
+                    <td class="num">@Format.Duration(day.Metrics.ActiveTime)</td>
+                    <td class="num">@Format.Duration(day.Metrics.FocusTime)</td>
+                    <td class="num">@Format.Duration(day.Metrics.DistractionTime)</td>
+                    <td class="num">@Format.Duration(day.Metrics.LongestStreak)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const days = @Json.Serialize(Model.Select(d => new
+    {
+        label = d.Day.ToString("ddd d"),
+        score = d.Metrics.Score,
+        focus = Math.Round(d.Metrics.FocusTime.TotalHours, 2),
+        neutral = Math.Round(d.Metrics.NeutralTime.TotalHours, 2),
+        distraction = Math.Round(d.Metrics.DistractionTime.TotalHours, 2),
+    }));
+    const hoursBar = (label, key) => ({
+        type: 'bar', label, data: days.map(d => d[key]),
+        backgroundColor: categoryColors[label], stack: 'hours', yAxisID: 'hours',
+    });
+    new Chart(document.getElementById('week'), {
+        data: {
+            labels: days.map(d => d.label),
+            datasets: [
+                {
+                    type: 'line', label: 'Score', data: days.map(d => d.score), yAxisID: 'score',
+                    borderColor: css.getPropertyValue('--accent').trim(), tension: 0.3,
+                },
+                hoursBar('Focus', 'focus'),
+                hoursBar('Neutral', 'neutral'),
+                hoursBar('Distraction', 'distraction'),
+            ],
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true } },
+            scales: {
+                hours: { stacked: true, position: 'left', title: { display: true, text: 'hours' } },
+                score: { position: 'right', min: 0, max: 100, grid: { display: false }, title: { display: true, text: 'score' } },
+                x: { stacked: true },
+            },
+        },
+    });
+</script>

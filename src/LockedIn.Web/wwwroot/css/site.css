@@ -1,31 +1,108 @@
-html {
-  font-size: 14px;
+:root {
+    --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --bg: #f7f7f8;
+    --card: #ffffff;
+    --text: #1b1d22;
+    --muted: #6b7280;
+    --border: #e4e5e9;
+    --accent: #4f46e5;
+    --focus: #16a34a;
+    --neutral: #9ca3af;
+    --distraction: #dc2626;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #111317;
+        --card: #1a1d23;
+        --text: #e8e9ec;
+        --muted: #9096a1;
+        --border: #2a2e36;
+        --accent: #818cf8;
+        --focus: #22c55e;
+        --neutral: #6b7280;
+        --distraction: #ef4444;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
+* { box-sizing: border-box; }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+header { border-bottom: 1px solid var(--border); background: var(--card); }
+
+nav {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0.75rem 1rem;
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    align-items: baseline;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+nav a { color: var(--muted); text-decoration: none; }
+nav a:hover { color: var(--text); }
+nav .brand { color: var(--text); font-weight: 700; margin-right: auto; }
+
+main { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+footer { max-width: 960px; margin: 0 auto; padding: 1rem; color: var(--muted); font-size: 0.85rem; }
+
+h1 { font-size: 1.4rem; margin: 0 0 1rem; }
+h2 { font-size: 1rem; margin: 0 0 0.75rem; color: var(--muted); font-weight: 600; }
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
 }
+
+.score { text-align: center; }
+.score .value { font-size: 5rem; font-weight: 800; line-height: 1; color: var(--accent); }
+.score .label { color: var(--muted); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.stats .card { margin: 0; }
+.stat-value { font-size: 1.5rem; font-weight: 700; }
+.stat-label { color: var(--muted); font-size: 0.85rem; }
+
+.breakdown { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--border); }
+.breakdown span { display: block; }
+.legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.75rem; font-size: 0.9rem; }
+
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 0.35rem; }
+.Focus { background: var(--focus); }
+.Neutral { background: var(--neutral); }
+.Distraction { background: var(--distraction); }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 0.5rem 0.25rem; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 0.85rem; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.bar { height: 8px; border-radius: 4px; min-width: 2px; }
+
+.tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.tabs a { padding: 0.25rem 0.75rem; border-radius: 6px; color: var(--muted); text-decoration: none; border: 1px solid var(--border); }
+.tabs a.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+select, button {
+    font: inherit;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+}
+
+.muted { color: var(--muted); }
+.empty { color: var(--muted); text-align: center; padding: 2rem; }

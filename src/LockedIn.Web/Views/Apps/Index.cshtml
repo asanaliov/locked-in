@@ -1,0 +1,41 @@
+@model TopAppsViewModel
+@{
+    ViewData["Title"] = "Top apps";
+    var longest = Model.Metrics.Apps.FirstOrDefault()?.Time ?? TimeSpan.Zero;
+}
+
+<h1>Top apps</h1>
+
+<div class="tabs">
+    @foreach (var (days, label) in new[] { (1, "Today"), (7, "7 days"), (30, "30 days") })
+    {
+        <a asp-action="Index" asp-route-days="@days" class="@(days == Model.Days ? "active" : null)">@label</a>
+    }
+</div>
+
+<div class="card">
+    @if (Model.Metrics.Apps.Count == 0)
+    {
+        <div class="empty">No apps tracked in this period.</div>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr><th>App</th><th>Category</th><th style="width: 40%"></th><th class="num">Time</th><th class="num">Share</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var app in Model.Metrics.Apps)
+                {
+                    <tr>
+                        <td>@app.AppName</td>
+                        <td><span class="dot @app.Category"></span>@app.Category</td>
+                        <td><div class="bar @app.Category" style="width: @((app.Time / longest * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div></td>
+                        <td class="num">@Format.Duration(app.Time)</td>
+                        <td class="num muted">@Format.Percent(app.Time / Model.Metrics.ActiveTime)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

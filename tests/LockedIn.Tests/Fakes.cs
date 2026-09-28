@@ -1,4 +1,5 @@
 using LockedIn.Data;
+using LockedIn.Data.Classification;
 using LockedIn.Tracker;
 using LockedIn.Tracker.Sessions;
 using LockedIn.Tracker.Windows;
@@ -24,6 +25,13 @@ internal sealed class FakeIdleDetector : IIdleDetector
     public TimeSpan IdleTime { get; set; }
 
     public TimeSpan GetIdleTime() => IdleTime;
+}
+
+internal sealed class FakeOverrides : ICategoryOverrides
+{
+    public Dictionary<string, Category> Overrides { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public Category? Find(string appName) => Overrides.TryGetValue(appName, out var category) ? category : null;
 }
 
 internal sealed class InMemorySessionStore : ISessionStore

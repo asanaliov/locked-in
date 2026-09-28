@@ -5,20 +5,27 @@ namespace LockedIn.Tests;
 
 public sealed class AppClassifierTests
 {
-    private readonly AppClassifier _classifier = new(new CategoryRules
+    private readonly FakeOverrides _overrides = new();
+    private readonly AppClassifier _classifier;
+
+    public AppClassifierTests()
     {
-        Browsers = new(StringComparer.OrdinalIgnoreCase) { "chrome" },
-        Apps = new(StringComparer.OrdinalIgnoreCase)
+        var rules = new CategoryRules
         {
-            ["rider64"] = Category.Focus,
-            ["Discord"] = Category.Distraction,
-        },
-        TitleKeywords = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["youtube"] = Category.Distraction,
-            ["github"] = Category.Focus,
-        },
-    });
+            Browsers = new(StringComparer.OrdinalIgnoreCase) { "chrome" },
+            Apps = new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["rider64"] = Category.Focus,
+                ["Discord"] = Category.Distraction,
+            },
+            TitleKeywords = new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["youtube"] = Category.Distraction,
+                ["github"] = Category.Focus,
+            },
+        };
+        _classifier = new AppClassifier(rules, _overrides);
+    }
 
     [Theory]
     [InlineData("rider64", Category.Focus)]
@@ -38,4 +45,21 @@ public sealed class AppClassifierTests
     [Fact]
     public void Title_keywords_are_ignored_for_non_browsers() =>
         Assert.Equal(Category.Distraction, _classifier.Classify("Discord", "github notifications"));
+
+    [Fact]
+    public void Override_wins_over_app_rule()
+    {
+        _overrides.Overrides["Discord"] = Category.Focus;
+
+        Assert.Equal(Category.Focus, _classifier.Classify("Discord", "team chat"));
+    }
+
+    [Fact]
+    public void Browser_title_keyword_wins_over_override()
+    {
+        _overrides.Overrides["chrome"] = Category.Focus;
+
+        Assert.Equal(Category.Distraction, _classifier.Classify("chrome", "YouTube"));
+        Assert.Equal(Category.Focus, _classifier.Classify("chrome", "New Tab"));
+    }
 }

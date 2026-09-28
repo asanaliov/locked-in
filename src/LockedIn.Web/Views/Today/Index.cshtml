@@ -1,0 +1,65 @@
+@model DayMetrics
+@{
+    ViewData["Title"] = "Today";
+    var apps = Model.Apps.Take(15).ToList();
+}
+
+<div class="card score">
+    <div class="value">@Model.Score</div>
+    <div class="label">Locked-In Score today</div>
+</div>
+
+<div class="stats">
+    <div class="card">
+        <div class="stat-value">@Format.Duration(Model.ActiveTime)</div>
+        <div class="stat-label">Active time</div>
+    </div>
+    <div class="card">
+        <div class="stat-value">@Format.Percent(Model.FocusRatio)</div>
+        <div class="stat-label">Focus ratio</div>
+    </div>
+    <div class="card">
+        <div class="stat-value">@Format.Duration(Model.LongestStreak)</div>
+        <div class="stat-label">Longest deep work streak</div>
+    </div>
+    <div class="card">
+        <div class="stat-value">@Model.SwitchesPerHour.ToString("0.#")</div>
+        <div class="stat-label">Context switches / hour</div>
+    </div>
+</div>
+
+@if (Model.ActiveTime == TimeSpan.Zero)
+{
+    <div class="card empty">Nothing tracked yet today. Is the tracker running?</div>
+    return;
+}
+
+<div class="card">
+    <h2>Breakdown</h2>
+    <partial name="_CategoryBreakdown" model="Model" />
+</div>
+
+<div class="card">
+    <h2>Time per app</h2>
+    <div style="height: @(apps.Count * 28 + 40)px"><canvas id="apps"></canvas></div>
+</div>
+
+<script>
+    const apps = @Json.Serialize(apps.Select(a => new { name = a.AppName, category = a.Category.ToString(), minutes = Math.Round(a.Time.TotalMinutes, 1) }));
+    new Chart(document.getElementById('apps'), {
+        type: 'bar',
+        data: {
+            labels: apps.map(a => a.name),
+            datasets: [{
+                data: apps.map(a => a.minutes),
+                backgroundColor: apps.map(a => categoryColors[a.category]),
+                borderRadius: 4,
+            }],
+        },
+        options: {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            scales: { x: { title: { display: true, text: 'minutes' } } },
+        },
+    });
+</script>

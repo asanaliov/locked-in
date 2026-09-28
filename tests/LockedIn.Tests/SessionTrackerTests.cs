@@ -25,7 +25,7 @@ public sealed class SessionTrackerTests
             Apps = new(StringComparer.OrdinalIgnoreCase) { ["rider64"] = Category.Focus },
             TitleKeywords = new(StringComparer.OrdinalIgnoreCase) { ["youtube"] = Category.Distraction },
         };
-        return new SessionTracker(_windows, _idle, new AppClassifier(rules), _clock, _store, Options.Create(_options));
+        return new SessionTracker(_windows, _idle, new AppClassifier(rules, new FakeOverrides()), _clock, _store, Options.Create(_options));
     }
 
     private async Task TickAsync(SessionTracker tracker, int times = 1)
