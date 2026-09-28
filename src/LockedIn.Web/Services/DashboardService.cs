@@ -7,7 +7,10 @@ namespace LockedIn.Web.Services;
 
 public sealed record DaySummary(DateOnly Day, DayMetrics Metrics);
 
-public sealed class DashboardService(IDbContextFactory<LockedInDbContext> dbFactory, IOptions<MetricsOptions> options)
+public sealed class DashboardService(
+    IDbContextFactory<LockedInDbContext> dbFactory,
+    ICurrentSessionSource currentSession,
+    IOptions<MetricsOptions> options)
 {
     public static DateOnly Today => DateOnly.FromDateTime(DateTime.Now);
 
@@ -19,7 +22,7 @@ public sealed class DashboardService(IDbContextFactory<LockedInDbContext> dbFact
     {
         await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
         var sessions = await db.LoadClippedAsync(
-            SessionQueries.UtcRange(first).FromUtc, SessionQueries.UtcRange(last).ToUtc, cancellationToken);
+            SessionQueries.UtcRange(first).FromUtc, SessionQueries.UtcRange(last).ToUtc, currentSession, cancellationToken);
         return DayMetricsCalculator.Calculate(sessions, options.Value.StreakInterruptionTolerance);
     }
 

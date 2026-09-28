@@ -1,5 +1,6 @@
-using LockedIn.Data;
 using LockedIn.Tracker.Sessions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 
@@ -7,13 +8,11 @@ namespace LockedIn.Tracker;
 
 public sealed class Worker(
     SessionTracker tracker,
-    IServiceProvider services,
     IOptions<TrackerOptions> options,
     ILogger<Worker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await services.InitializeLockedInDatabaseAsync(stoppingToken);
         SystemEvents.SessionEnding += OnSessionEnding;
 
         using var timer = new PeriodicTimer(options.Value.PollInterval);

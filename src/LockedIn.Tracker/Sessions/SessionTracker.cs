@@ -15,7 +15,7 @@ public sealed class SessionTracker(
     IAppClassifier classifier,
     IClock clock,
     ISessionStore store,
-    IOptions<TrackerOptions> options)
+    IOptions<TrackerOptions> options) : ICurrentSessionSource
 {
     private readonly TrackerOptions _options = options.Value;
     private UsageSession? _current;
@@ -58,7 +58,7 @@ public sealed class SessionTracker(
         };
     }
 
-    /// <summary>A copy of the in-progress session ending now. Safe to call from another thread.</summary>
+    /// <summary>Safe to call from another thread.</summary>
     public UsageSession? SnapshotCurrent()
     {
         if (Volatile.Read(ref _current) is not { } session)

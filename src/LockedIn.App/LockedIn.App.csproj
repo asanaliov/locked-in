@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- LockedIn.exe: tray icon + app window, hosting the tracker and the dashboard in one process. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>LockedIn</AssemblyName>
+    <RootNamespace>LockedIn.App</RootNamespace>
+    <ApplicationIcon>lockedin.ico</ApplicationIcon>
+    <Product>locked-in</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LockedIn.Data\LockedIn.Data.csproj" />
+    <ProjectReference Include="..\LockedIn.Tracker\LockedIn.Tracker.csproj" />
+    <ProjectReference Include="..\LockedIn.Web\LockedIn.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+  </ItemGroup>
+
+  <!-- The WebView2 package always references its WPF control, which clashes with WinForms. We only use the WinForms one. -->
+  <Target Name="RemoveWebView2Wpf" BeforeTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <Reference Remove="@(Reference)" Condition="'%(Filename)' == 'Microsoft.Web.WebView2.Wpf'" />
+    </ItemGroup>
+  </Target>
+
+</Project>

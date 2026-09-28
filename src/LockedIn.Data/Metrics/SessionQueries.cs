@@ -8,15 +8,25 @@ public static class SessionQueries
     public static (DateTime FromUtc, DateTime ToUtc) UtcRange(DateOnly localDay) =>
         (ToUtc(localDay), ToUtc(localDay.AddDays(1)));
 
-    /// <summary>Sessions overlapping the range, trimmed so they don't stick out of it.</summary>
+    /// <summary>
+    /// Saved sessions overlapping the range plus the one still in progress,
+    /// all trimmed so they don't stick out of the range.
+    /// </summary>
     public static async Task<List<UsageSession>> LoadClippedAsync(
-        this LockedInDbContext db, DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken = default)
+        this LockedInDbContext db,
+        DateTime fromUtc,
+        DateTime toUtc,
+        ICurrentSessionSource currentSession,
+        CancellationToken cancellationToken = default)
     {
         var sessions = await db.UsageSessions
             .AsNoTracking()
             .Where(s => s.StartTime < toUtc && s.EndTime > fromUtc)
             .OrderBy(s => s.StartTime)
             .ToListAsync(cancellationToken);
+
+        if (currentSession.SnapshotCurrent() is { } current && current.StartTime < toUtc && current.EndTime > fromUtc)
+            sessions.Add(current);
 
         foreach (var session in sessions)
         {
