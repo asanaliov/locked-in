@@ -1,14 +1,14 @@
-<img src="docs/logo/logo.png" width="96" alt="locked-in logo">
+<img src="docs/logo/logo.png" width="96" alt="Locked In logo">
 
-# locked-in
+# Locked In
 
 [![build](https://github.com/asanaliov/locked-in/actions/workflows/build.yml/badge.svg)](https://github.com/asanaliov/locked-in/actions/workflows/build.yml)
 
 A small Windows app that tracks your screen time and focus. It lives in the system tray, quietly
 records which app you're using, sorts each one into **Focus**, **Neutral** or **Distraction**, and
-gives you a daily **Locked-In Score** from 0 to 100 that says how focused you really were.
+gives you a daily **Locked In Score** from 0 to 100 that says how focused you really were.
 
-![The locked-in window showing today's score, focus breakdown and time per app (demo data)](docs/screenshot.png)
+![The Locked In window showing today's score, focus breakdown and time per app (demo data)](docs/screenshot.png)
 
 ## Features
 
@@ -17,12 +17,12 @@ gives you a daily **Locked-In Score** from 0 to 100 that says how focused you re
 - **Idle detection**: after 2 minutes without keyboard or mouse input it stops counting
 - **Categories** from simple rules: process names, plus title keywords for browsers
   (a YouTube tab is a distraction, a GitHub tab is focus)
-- **Locked-In Score**, focus ratio, longest deep work streak and context switches per hour
+- **Locked In Score**, focus ratio, longest deep work streak and context switches per hour
 - **Dashboard window**: today, the last 7 days, top apps, and per-app category settings
 - **Tray icon** showing today's score and your current streak on hover, with an optional "Start with Windows"
 - **Private by default**: everything stays in one local SQLite file, and window titles aren't saved
 
-## How the Locked-In Score works
+## How the Locked In Score works
 
 Each day gets three numbers, all counted over *active* (non-idle) time:
 
@@ -48,7 +48,7 @@ All the weights live in one class, [`LockedInScoreCalculator`](src/LockedIn.Data
 1. Download `locked-in-setup-x.y.z.exe` from the [latest release](https://github.com/asanaliov/locked-in/releases/latest).
 2. Run it. It installs for your user only, so no admin rights are needed, and it includes everything
    it needs (no separate .NET install).
-3. locked-in opens its window and starts tracking. Closing the window keeps it running in the tray;
+3. Locked In opens its window and starts tracking. Closing the window keeps it running in the tray;
    right-click the tray icon to reopen it, turn **Start with Windows** on or off, or exit.
 
 The window uses the Microsoft Edge WebView2 Runtime, which is built into Windows 11 and most
@@ -88,7 +88,7 @@ installer and attaches it to the GitHub release.
 ## Configuration
 
 Settings live in `lockedin.json` next to `LockedIn.exe` (source: [`src/LockedIn.Data/lockedin.json`](src/LockedIn.Data/lockedin.json)).
-Restart locked-in after editing it.
+Restart Locked In after editing it.
 You can override any value with environment variables, for example `LockedIn__DatabasePath`.
 
 | Setting | Default | |

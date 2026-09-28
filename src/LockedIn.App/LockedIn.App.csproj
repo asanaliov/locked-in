@@ -8,7 +8,8 @@
     <AssemblyName>LockedIn</AssemblyName>
     <RootNamespace>LockedIn.App</RootNamespace>
     <ApplicationIcon>lockedin.ico</ApplicationIcon>
-    <Product>locked-in</Product>
+    <Product>Locked In</Product>
+    <AssemblyTitle>Locked In</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 

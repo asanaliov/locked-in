@@ -29,7 +29,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         var menu = BuildMenu();
         var ui = SynchronizationContext.Current!;
 
-        _icon = new NotifyIcon { Icon = AppIcon.Value, Text = "locked-in", Visible = true, ContextMenuStrip = menu };
+        _icon = new NotifyIcon { Icon = AppIcon.Value, Text = "Locked In", Visible = true, ContextMenuStrip = menu };
         _icon.MouseMove += async (_, _) => await RefreshTooltipAsync();
         _icon.MouseClick += (_, e) =>
         {
@@ -63,7 +63,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         };
 
         var menu = new ContextMenuStrip();
-        menu.Items.Add("Open locked-in", null, (_, _) => ShowWindow());
+        menu.Items.Add("Open Locked In", null, (_, _) => ShowWindow());
         menu.Items.Add(startWithWindows);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitThread());
@@ -91,11 +91,11 @@ internal sealed class TrayApplicationContext : ApplicationContext
         {
             // Off the UI thread so the database call never blocks the message loop.
             var live = await Task.Run(() => _status.GetAsync(CancellationToken.None));
-            _icon.Text = $"locked-in · score {live.Score} · streak {Format.Duration(live.CurrentStreak)}";
+            _icon.Text = $"Locked In · score {live.Score} · streak {Format.Duration(live.CurrentStreak)}";
         }
         catch (Exception)
         {
-            _icon.Text = "locked-in";
+            _icon.Text = "Locked In";
         }
     }
 }
