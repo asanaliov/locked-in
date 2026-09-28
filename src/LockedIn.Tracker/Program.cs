@@ -1,4 +1,5 @@
 using LockedIn.Data;
+using LockedIn.Data.Classification;
 using LockedIn.Tracker;
 using LockedIn.Tracker.Sessions;
 using LockedIn.Tracker.Windows;
@@ -8,6 +9,8 @@ builder.Configuration.AddLockedInSettings();
 
 builder.Services.Configure<TrackerOptions>(builder.Configuration.GetSection(TrackerOptions.SectionName));
 builder.Services.AddLockedInDatabase(builder.Configuration);
+builder.Services.AddSingleton(builder.Configuration.GetSection(CategoryRules.SectionName).Get<CategoryRules>() ?? new());
+builder.Services.AddSingleton<IAppClassifier, AppClassifier>();
 builder.Services.AddSingleton<IActiveWindowProvider, Win32ActiveWindowProvider>();
 builder.Services.AddSingleton<IIdleDetector, Win32IdleDetector>();
 builder.Services.AddSingleton<IClock, SystemClock>();

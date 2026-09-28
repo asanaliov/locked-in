@@ -5,6 +5,51 @@
       "PollInterval": "00:00:03",
       "IdleThreshold": "00:02:00",
       "StoreWindowTitles": false
+    },
+    "Categories": {
+      "Browsers": [ "chrome", "msedge", "firefox", "brave", "opera", "vivaldi", "arc" ],
+      "Apps": {
+        "rider64": "Focus",
+        "devenv": "Focus",
+        "Code": "Focus",
+        "Cursor": "Focus",
+        "idea64": "Focus",
+        "pycharm64": "Focus",
+        "webstorm64": "Focus",
+        "datagrip64": "Focus",
+        "WindowsTerminal": "Focus",
+        "powershell": "Focus",
+        "pwsh": "Focus",
+        "cmd": "Focus",
+        "notepad++": "Focus",
+        "sublime_text": "Focus",
+        "explorer": "Neutral",
+        "SystemSettings": "Neutral",
+        "ApplicationFrameHost": "Neutral",
+        "Taskmgr": "Neutral",
+        "Discord": "Distraction",
+        "steam": "Distraction",
+        "steamwebhelper": "Distraction",
+        "Telegram": "Distraction",
+        "WhatsApp": "Distraction"
+      },
+      "TitleKeywords": {
+        "youtube": "Distraction",
+        "netflix": "Distraction",
+        "twitch": "Distraction",
+        "reddit": "Distraction",
+        "instagram": "Distraction",
+        "facebook": "Distraction",
+        "tiktok": "Distraction",
+        "twitter": "Distraction",
+        "github": "Focus",
+        "stackoverflow": "Focus",
+        "stack overflow": "Focus",
+        "docs": "Focus",
+        "documentation": "Focus",
+        "learn.microsoft": "Focus",
+        "localhost": "Focus"
+      }
     }
   }
 }

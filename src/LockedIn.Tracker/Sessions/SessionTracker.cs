@@ -1,4 +1,5 @@
 using LockedIn.Data;
+using LockedIn.Data.Classification;
 using LockedIn.Tracker.Windows;
 using Microsoft.Extensions.Options;
 
@@ -6,11 +7,12 @@ namespace LockedIn.Tracker.Sessions;
 
 /// <summary>
 /// Keeps the current session in memory and only writes it out when it ends:
-/// on an app change, when the user goes idle, or on shutdown.
+/// on an app or category change, when the user goes idle, or on shutdown.
 /// </summary>
 public sealed class SessionTracker(
     IActiveWindowProvider windows,
     IIdleDetector idleDetector,
+    IAppClassifier classifier,
     IClock clock,
     ISessionStore store,
     IOptions<TrackerOptions> options)
@@ -42,13 +44,15 @@ public sealed class SessionTracker(
             return;
         }
 
-        if (_current?.AppName == window.AppName)
+        var category = classifier.Classify(window.AppName, window.Title);
+        if (_current?.AppName == window.AppName && _current.Category == category)
             return;
 
         await CloseCurrentAsync(now, cancellationToken);
         _current = new UsageSession
         {
             AppName = window.AppName,
+            Category = category,
             WindowTitle = _options.StoreWindowTitles ? window.Title : null,
             StartTime = now,
         };
