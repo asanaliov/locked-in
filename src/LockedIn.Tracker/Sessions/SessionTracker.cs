@@ -15,9 +15,8 @@ public sealed class SessionTracker(
     IAppClassifier classifier,
     IClock clock,
     ISessionStore store,
-    IOptions<TrackerOptions> options) : ICurrentSessionSource
+    IOptionsMonitor<TrackerOptions> options) : ICurrentSessionSource
 {
-    private readonly TrackerOptions _options = options.Value;
     private UsageSession? _current;
     private DateTime? _lastTick;
 
@@ -26,12 +25,12 @@ public sealed class SessionTracker(
         var now = clock.UtcNow;
 
         // A long gap between ticks means the machine slept; the session ended when we stopped ticking.
-        if (_lastTick is { } lastTick && now - lastTick > _options.IdleThreshold)
+        if (_lastTick is { } lastTick && now - lastTick > options.CurrentValue.IdleThreshold)
             await CloseCurrentAsync(lastTick, cancellationToken);
         _lastTick = now;
 
         var idleTime = idleDetector.GetIdleTime();
-        if (idleTime > _options.IdleThreshold)
+        if (idleTime > options.CurrentValue.IdleThreshold)
         {
             await CloseCurrentAsync(now - idleTime, cancellationToken);
             return;
@@ -53,7 +52,7 @@ public sealed class SessionTracker(
         {
             AppName = window.AppName,
             Category = category,
-            WindowTitle = _options.StoreWindowTitles ? window.Title : null,
+            WindowTitle = options.CurrentValue.StoreWindowTitles ? window.Title : null,
             StartTime = now,
         };
     }

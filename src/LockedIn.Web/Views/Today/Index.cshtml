@@ -40,7 +40,7 @@
     (() => {
         const el = document.getElementById('score');
         const target = +el.dataset.value;
-        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (reduceMotion) return;
         const start = performance.now();
         const tick = now => {
             const t = Math.min((now - start) / 1200, 1);

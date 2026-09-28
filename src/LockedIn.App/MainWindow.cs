@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using LockedIn.Data;
+using Microsoft.Extensions.Options;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
@@ -27,10 +29,13 @@ internal sealed partial class MainWindow : Form
 
     private readonly WebView2 _webView = new() { Dock = DockStyle.Fill };
     private readonly Uri _dashboard;
+    private readonly IOptionsMonitor<AppearanceOptions> _appearance;
+    private readonly IDisposable? _appearanceChanged;
 
-    public MainWindow(string dashboardUrl)
+    public MainWindow(string dashboardUrl, IOptionsMonitor<AppearanceOptions> appearance)
     {
         _dashboard = new Uri(dashboardUrl);
+        _appearance = appearance;
 
         Text = "locked-in";
         Icon = AppIcon.Value;
@@ -41,6 +46,7 @@ internal sealed partial class MainWindow : Form
 
         ApplyTheme();
         SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
+        _appearanceChanged = appearance.OnChange(_ => ApplyThemeFromAnyThread());
         Load += async (_, _) => await ShowDashboardAsync();
     }
 
@@ -53,13 +59,22 @@ internal sealed partial class MainWindow : Form
     protected override void Dispose(bool disposing)
     {
         if (disposing)
+        {
             SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
+            _appearanceChanged?.Dispose();
+        }
         base.Dispose(disposing);
     }
 
     private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
     {
         if (e.Category == UserPreferenceCategory.General)
+            ApplyThemeFromAnyThread();
+    }
+
+    private void ApplyThemeFromAnyThread()
+    {
+        if (IsHandleCreated && !IsDisposed)
             BeginInvoke(ApplyTheme);
     }
 
@@ -85,7 +100,14 @@ internal sealed partial class MainWindow : Form
     private void SetWindowAttribute(int attribute, int value) =>
         DwmSetWindowAttribute(Handle, attribute, ref value, sizeof(int));
 
-    private static bool IsDarkMode() =>
+    private bool IsDarkMode() => _appearance.CurrentValue.Theme switch
+    {
+        Theme.Light => false,
+        Theme.Dark => true,
+        _ => IsWindowsDarkMode(),
+    };
+
+    private static bool IsWindowsDarkMode() =>
         Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
             "AppsUseLightTheme", 1) is 0;
 

@@ -4,10 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LockedIn.Web.Controllers;
 
-public sealed class SettingsController(CategorySettingsService settings) : Controller
+public sealed record SettingsViewModel(GeneralSettings General, IReadOnlyList<AppCategoryRow> Apps);
+
+public sealed class SettingsController(CategorySettingsService settings, GeneralSettingsService general) : Controller
 {
     public async Task<IActionResult> Index(CancellationToken cancellationToken) =>
-        View(await settings.GetAppsAsync(cancellationToken));
+        View(new SettingsViewModel(general.Get(), await settings.GetAppsAsync(cancellationToken)));
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public IActionResult SaveGeneral(GeneralSettings model)
+    {
+        general.Save(model);
+        return RedirectToAction(nameof(Index));
+    }
 
     /// <param name="category">The new category, or null to go back to the lockedin.json default.</param>
     [HttpPost, ValidateAntiForgeryToken]
@@ -16,6 +25,6 @@ public sealed class SettingsController(CategorySettingsService settings) : Contr
         if (!string.IsNullOrWhiteSpace(appName))
             await settings.SetCategoryAsync(appName, category, cancellationToken);
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), null, "categories");
     }
 }

@@ -1,4 +1,5 @@
 using LockedIn.Data;
+using Microsoft.Extensions.Options;
 
 namespace LockedIn.App.Tray;
 
@@ -12,6 +13,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
     private readonly string _dashboardUrl;
     private readonly LiveStatusProvider _status;
+    private readonly IOptionsMonitor<AppearanceOptions> _appearance;
     private readonly NotifyIcon _icon;
     private readonly RegisteredWaitHandle _activateWait;
     private MainWindow? _window;
@@ -21,6 +23,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
     {
         _dashboardUrl = dashboardUrl;
         _status = services.GetRequiredService<LiveStatusProvider>();
+        _appearance = services.GetRequiredService<IOptionsMonitor<AppearanceOptions>>();
 
         // Creating the menu installs the WinForms synchronization context captured below.
         var menu = BuildMenu();
@@ -70,7 +73,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
     private void ShowWindow()
     {
         if (_window is null || _window.IsDisposed)
-            _window = new MainWindow(_dashboardUrl);
+            _window = new MainWindow(_dashboardUrl, _appearance);
 
         _window.Show();
         if (_window.WindowState == FormWindowState.Minimized)

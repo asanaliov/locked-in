@@ -18,6 +18,7 @@ internal static class LockedInHost
         builder.Configuration.AddLockedInSettings();
 
         builder.Services.Configure<MetricsOptions>(builder.Configuration.GetSection(MetricsOptions.SectionName));
+        builder.Services.Configure<AppearanceOptions>(builder.Configuration.GetSection(AppearanceOptions.SectionName));
         builder.Services.AddLockedInDatabase(builder.Configuration);
         builder.Services.AddLockedInTracker(builder.Configuration);
         builder.Services.AddLockedInDashboard();

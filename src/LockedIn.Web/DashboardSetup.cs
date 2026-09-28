@@ -11,6 +11,7 @@ public static class DashboardSetup
     {
         services.AddScoped<DashboardService>();
         services.AddScoped<CategorySettingsService>();
+        services.AddScoped<GeneralSettingsService>();
         services.AddControllersWithViews().AddApplicationPart(typeof(DashboardSetup).Assembly);
         return services;
     }

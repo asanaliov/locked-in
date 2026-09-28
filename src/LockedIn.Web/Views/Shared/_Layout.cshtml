@@ -1,9 +1,14 @@
+@inject Microsoft.Extensions.Options.IOptionsMonitor<AppearanceOptions> AppearanceMonitor
 @{
+    var appearance = AppearanceMonitor.CurrentValue;
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     string? Active(string name) => controller == name ? "active" : null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      data-theme="@(appearance.Theme == Theme.System ? null : appearance.Theme.ToString().ToLowerInvariant())"
+      data-accent="@(appearance.Accent == Accent.Indigo ? null : appearance.Accent.ToString().ToLowerInvariant())"
+      data-motion="@(appearance.Animations ? null : "off")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,6 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script>
         const css = getComputedStyle(document.documentElement);
+        const reduceMotion = document.documentElement.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches;
         const categoryColors = {
             Focus: css.getPropertyValue('--focus').trim(),
             Neutral: css.getPropertyValue('--neutral').trim(),
@@ -24,7 +30,7 @@
         Chart.defaults.plugins.legend.labels.usePointStyle = true;
         Chart.defaults.plugins.tooltip.padding = 10;
         Chart.defaults.plugins.tooltip.cornerRadius = 8;
-        Chart.defaults.animation.duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900;
+        Chart.defaults.animation.duration = reduceMotion ? 0 : 900;
         Chart.defaults.animation.easing = 'easeOutQuart';
     </script>
 </head>
