@@ -58,14 +58,29 @@ public sealed class SessionTracker(
         };
     }
 
+    /// <summary>A copy of the in-progress session ending now. Safe to call from another thread.</summary>
+    public UsageSession? SnapshotCurrent()
+    {
+        if (Volatile.Read(ref _current) is not { } session)
+            return null;
+
+        return new UsageSession
+        {
+            AppName = session.AppName,
+            Category = session.Category,
+            StartTime = session.StartTime,
+            EndTime = clock.UtcNow,
+        };
+    }
+
     public Task FlushAsync(CancellationToken cancellationToken) => CloseCurrentAsync(clock.UtcNow, cancellationToken);
 
     private async Task CloseCurrentAsync(DateTime endTime, CancellationToken cancellationToken)
     {
-        if (_current is not { } session)
+        // Atomic, because a Windows shutdown can flush from another thread mid-tick.
+        if (Interlocked.Exchange(ref _current, null) is not { } session)
             return;
 
-        _current = null;
         if (endTime <= session.StartTime)
             return; // nothing measurable happened
 

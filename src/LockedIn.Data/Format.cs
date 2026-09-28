@@ -1,5 +1,6 @@
-namespace LockedIn.Web;
+namespace LockedIn.Data;
 
+/// <summary>Short human-readable text for durations and ratios, shared by the dashboard and tray.</summary>
 public static class Format
 {
     public static string Duration(TimeSpan time) => time.TotalHours >= 1

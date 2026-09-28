@@ -9,4 +9,7 @@ public sealed class TrackerOptions
 
     /// <summary>When false, window titles are only used for classification and never saved.</summary>
     public bool StoreWindowTitles { get; set; }
+
+    /// <summary>Opened from the tray icon.</summary>
+    public string DashboardUrl { get; set; } = "http://localhost:5080";
 }

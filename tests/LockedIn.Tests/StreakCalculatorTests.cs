@@ -49,6 +49,22 @@ public sealed class StreakCalculatorTests
     }
 
     [Fact]
+    public void Current_streak_includes_a_short_ongoing_interruption()
+    {
+        var sessions = new[] { At(0, 10, Focus), At(15, 40, Focus), At(40, 40.2, Distraction) };
+
+        Assert.Equal(TimeSpan.FromMinutes(25), StreakCalculator.CurrentFocusStreak(sessions, Tolerance, Day.AddMinutes(40.2)));
+    }
+
+    [Fact]
+    public void Current_streak_is_zero_after_a_long_interruption()
+    {
+        var sessions = new[] { At(0, 30, Focus), At(30, 35, Distraction) };
+
+        Assert.Equal(TimeSpan.Zero, StreakCalculator.CurrentFocusStreak(sessions, Tolerance, Day.AddMinutes(35)));
+    }
+
+    [Fact]
     public void Order_of_input_does_not_matter()
     {
         var sessions = new[] { At(20.25, 50, Focus), At(0, 20, Focus) };

@@ -1,6 +1,7 @@
 using LockedIn.Data;
 using LockedIn.Tracker.Sessions;
 using Microsoft.Extensions.Options;
+using Microsoft.Win32;
 
 namespace LockedIn.Tracker;
 
@@ -13,6 +14,7 @@ public sealed class Worker(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await services.InitializeLockedInDatabaseAsync(stoppingToken);
+        SystemEvents.SessionEnding += OnSessionEnding;
 
         using var timer = new PeriodicTimer(options.Value.PollInterval);
         do
@@ -31,7 +33,12 @@ public sealed class Worker(
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
+        SystemEvents.SessionEnding -= OnSessionEnding;
         await base.StopAsync(cancellationToken);
         await tracker.FlushAsync(CancellationToken.None);
     }
+
+    /// <summary>Logoff or shutdown may kill us before a normal stop, so save the current session right away.</summary>
+    private void OnSessionEnding(object? sender, SessionEndingEventArgs e) =>
+        tracker.FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
 }
