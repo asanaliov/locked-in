@@ -1,3 +1,7 @@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    string? Active(string name) => controller == name ? "active" : null;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,16 +21,27 @@
         Chart.defaults.borderColor = css.getPropertyValue('--border').trim();
         Chart.defaults.font.family = css.getPropertyValue('--font').trim();
         Chart.defaults.plugins.legend.display = false;
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        Chart.defaults.animation.duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900;
+        Chart.defaults.animation.easing = 'easeOutQuart';
     </script>
 </head>
 <body>
     <header>
         <nav>
-            <a class="brand" asp-controller="Today" asp-action="Index">locked-in</a>
-            <a asp-controller="Today" asp-action="Index">Today</a>
-            <a asp-controller="History" asp-action="Index">Last 7 days</a>
-            <a asp-controller="Apps" asp-action="Index">Top apps</a>
-            <a asp-controller="Settings" asp-action="Index">Settings</a>
+            <a class="brand" asp-controller="Today" asp-action="Index">
+                <svg width="18" height="18" viewBox="6 6 52 53" fill="currentColor" aria-hidden="true">
+                    <path d="M21 30V21a11 11 0 0 1 22 0v9" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" />
+                    <path d="M21 28h22a9 9 0 0 1 9 9v12a9 9 0 0 1-9 9H21a9 9 0 0 1-9-9V37a9 9 0 0 1 9-9ZM32 35a4 4 0 1 0 0 8a4 4 0 1 0 0-8ZM29.5 47.5v2a2.5 2.5 0 0 0 5 0v-2a2.5 2.5 0 0 0-5 0Z" fill-rule="evenodd" />
+                </svg>
+                locked-in
+            </a>
+            <a class="@Active("Today")" asp-controller="Today" asp-action="Index">Today</a>
+            <a class="@Active("History")" asp-controller="History" asp-action="Index">Last 7 days</a>
+            <a class="@Active("Apps")" asp-controller="Apps" asp-action="Index">Top apps</a>
+            <a class="@Active("Settings")" asp-controller="Settings" asp-action="Index">Settings</a>
         </nav>
     </header>
     <main>
