@@ -5,7 +5,7 @@ namespace LockedIn.App.Tray;
 /// <summary>"Start with Windows" via the current user's Run key. No admin rights needed.</summary>
 public static class StartupRegistration
 {
-    /// <summary>Passed at login so locked-in starts quietly in the tray without opening its window.</summary>
+    /// <summary>Passed at login so Locked In starts quietly in the tray without opening its window.</summary>
     public const string StartInTrayArgument = "--tray";
 
     // The installer writes the same key and value; keep them in sync with installer/LockedIn.iss.

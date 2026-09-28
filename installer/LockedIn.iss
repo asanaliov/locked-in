@@ -1,4 +1,4 @@
-; Inno Setup script for locked-in. Built by .github/workflows/release.yml:
+; Inno Setup script for Locked In. Built by .github/workflows/release.yml:
 ;   dotnet publish src/LockedIn.App -c Release -r win-x64 --self-contained -o artifacts/publish
 ;   ISCC.exe /DAppVersion=1.2.3 installer\LockedIn.iss
 
@@ -6,7 +6,7 @@
   #define AppVersion "0.0.0"
 #endif
 
-#define AppName "locked-in"
+#define AppName "Locked In"
 #define AppExe "LockedIn.exe"
 #define RunKey "Software\Microsoft\Windows\CurrentVersion\Run"
 
@@ -35,11 +35,16 @@ OutputDir=..\artifacts
 OutputBaseFilename=locked-in-setup-{#AppVersion}
 
 [Tasks]
-Name: "startup"; Description: "Start locked-in when I sign in to Windows"
+Name: "startup"; Description: "Start Locked In when I sign in to Windows"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; Flags: unchecked
 
 [Files]
 Source: "..\artifacts\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[InstallDelete]
+; Shortcuts from versions before the app was named "Locked In". Existing installs keep their folder.
+Type: files; Name: "{autoprograms}\locked-in.lnk"
+Type: files; Name: "{autodesktop}\locked-in.lnk"
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"

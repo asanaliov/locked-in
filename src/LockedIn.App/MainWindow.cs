@@ -37,7 +37,7 @@ internal sealed partial class MainWindow : Form
         _dashboard = new Uri(dashboardUrl);
         _appearance = appearance;
 
-        Text = "locked-in";
+        Text = "Locked In";
         Icon = AppIcon.Value;
         Size = new Size(1100, 850);
         MinimumSize = new Size(480, 400);
@@ -125,8 +125,8 @@ internal sealed partial class MainWindow : Form
         catch (WebView2RuntimeNotFoundException)
         {
             MessageBox.Show(
-                "locked-in needs the Microsoft Edge WebView2 Runtime. The dashboard will open in your browser instead.",
-                "locked-in", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                "Locked In needs the Microsoft Edge WebView2 Runtime. The dashboard will open in your browser instead.",
+                "Locked In", MessageBoxButtons.OK, MessageBoxIcon.Information);
             OpenInBrowser(_dashboard.ToString());
             Close();
             return;

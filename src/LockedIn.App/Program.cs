@@ -25,7 +25,7 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"locked-in could not start:\n\n{ex.Message}", "locked-in", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Locked In could not start:\n\n{ex.Message}", "Locked In", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 

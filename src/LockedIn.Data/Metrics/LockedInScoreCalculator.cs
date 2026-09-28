@@ -1,7 +1,7 @@
 namespace LockedIn.Data.Metrics;
 
 /// <summary>
-/// Locked-In Score (0-100) = 60% focus ratio + 30% longest streak (capped at 90 min) + 10% low switching.
+/// Locked In Score (0-100) = 60% focus ratio + 30% longest streak (capped at 90 min) + 10% low switching.
 /// </summary>
 public static class LockedInScoreCalculator
 {
