@@ -1,3 +1,5 @@
+<img src="docs/logo/logo.png" width="96" alt="locked-in logo">
+
 # locked-in
 
 [![build](https://github.com/asanaliov/locked-in/actions/workflows/build.yml/badge.svg)](https://github.com/asanaliov/locked-in/actions/workflows/build.yml)
