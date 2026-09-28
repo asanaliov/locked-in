@@ -108,7 +108,7 @@
             @foreach (var app in Model.Apps)
             {
                 <tr>
-                    <td>@app.AppName @if (app.IsBrowser) { <span class="muted">(browser)</span> }</td>
+                    <td><span class="app-cell"><partial name="_AppIcon" model="(app.AppName, app.Effective)" />@app.AppName @if (app.IsBrowser) { <span class="muted">(browser)</span> }</span></td>
                     <td class="muted">@app.DefaultCategory</td>
                     <td>
                         <form asp-action="SetCategory" method="post">

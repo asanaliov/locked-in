@@ -6,6 +6,7 @@ namespace LockedIn.Tracker.Windows;
 public sealed class Win32ActiveWindowProvider : IActiveWindowProvider
 {
     private const int MaxTitleLength = 512;
+    private const int MaxPathLength = 1024;
 
     public ActiveWindow? GetActiveWindow()
     {
@@ -15,7 +16,7 @@ public sealed class Win32ActiveWindowProvider : IActiveWindowProvider
 
         NativeMethods.GetWindowThreadProcessId(handle, out var processId);
         var appName = GetProcessName(processId);
-        return appName is null ? null : new ActiveWindow(appName, GetTitle(handle));
+        return appName is null ? null : new ActiveWindow(appName, GetTitle(handle), GetExecutablePath(processId));
     }
 
     private static string? GetProcessName(uint processId)
@@ -28,6 +29,25 @@ public sealed class Win32ActiveWindowProvider : IActiveWindowProvider
         catch (ArgumentException)
         {
             return null; // process exited between the two calls
+        }
+    }
+
+    /// <summary>Limited query access works even for elevated apps like Task Manager, unlike Process.MainModule.</summary>
+    private static string? GetExecutablePath(uint processId)
+    {
+        var process = NativeMethods.OpenProcess(NativeMethods.ProcessQueryLimitedInformation, false, processId);
+        if (process == IntPtr.Zero)
+            return null;
+
+        try
+        {
+            var buffer = new char[MaxPathLength];
+            var size = (uint)buffer.Length;
+            return NativeMethods.QueryFullProcessImageName(process, 0, buffer, ref size) ? new string(buffer, 0, (int)size) : null;
+        }
+        finally
+        {
+            NativeMethods.CloseHandle(process);
         }
     }
 

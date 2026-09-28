@@ -35,6 +35,13 @@ internal sealed class FakeOverrides : ICategoryOverrides
     public Category? Find(string appName) => Overrides.TryGetValue(appName, out var category) ? category : null;
 }
 
+internal sealed class FakeIconCache : IAppIconCache
+{
+    public List<(string AppName, string Path)> Remembered { get; } = [];
+
+    public void Remember(string appName, string executablePath) => Remembered.Add((appName, executablePath));
+}
+
 internal sealed class InMemorySessionStore : ISessionStore
 {
     public List<UsageSession> Saved { get; } = [];

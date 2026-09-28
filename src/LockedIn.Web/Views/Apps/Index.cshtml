@@ -24,7 +24,7 @@
             @foreach (var app in Model.Metrics.Apps)
             {
                 <li class="app-row">
-                    <div class="app-icon @app.Category" aria-hidden="true">@app.AppName[..1].ToUpperInvariant()</div>
+                    <partial name="_AppIcon" model="(app.AppName, app.Category)" />
                     <div>
                         <div class="app-name">@app.AppName</div>
                         <div class="app-sub">@app.Category</div>

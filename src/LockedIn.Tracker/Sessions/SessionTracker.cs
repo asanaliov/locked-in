@@ -15,6 +15,7 @@ public sealed class SessionTracker(
     IAppClassifier classifier,
     IClock clock,
     ISessionStore store,
+    IAppIconCache icons,
     IOptionsMonitor<TrackerOptions> options) : ICurrentSessionSource
 {
     private UsageSession? _current;
@@ -48,6 +49,9 @@ public sealed class SessionTracker(
             return;
 
         await CloseCurrentAsync(now, cancellationToken);
+        if (window.ExecutablePath is { } path)
+            icons.Remember(window.AppName, path);
+
         _current = new UsageSession
         {
             AppName = window.AppName,

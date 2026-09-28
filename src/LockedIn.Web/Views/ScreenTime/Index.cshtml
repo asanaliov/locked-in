@@ -56,7 +56,7 @@
                 @foreach (var app in today.Apps)
                 {
                     <tr>
-                        <td>@app.AppName</td>
+                        <td><span class="app-cell"><partial name="_AppIcon" model="(app.AppName, app.Category)" />@app.AppName</span></td>
                         <td style="width: 55%"><div class="bar screen-bar" style="width: @((app.Time / longest * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div></td>
                         <td class="num">@Format.Duration(app.Time)</td>
                     </tr>

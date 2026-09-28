@@ -2,6 +2,7 @@ using LockedIn.App.Tray;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using LockedIn.Tracker;
+using LockedIn.Tracker.Windows;
 using LockedIn.Web;
 
 namespace LockedIn.App;
@@ -21,6 +22,7 @@ internal static class LockedInHost
         builder.Services.Configure<AppearanceOptions>(builder.Configuration.GetSection(AppearanceOptions.SectionName));
         builder.Services.AddLockedInDatabase(builder.Configuration);
         builder.Services.AddLockedInTracker(builder.Configuration);
+        builder.Services.AddSingleton<IAppIconCache, AppIconCache>();
         builder.Services.AddLockedInDashboard();
         builder.Services.AddSingleton<LiveStatusProvider>();
 

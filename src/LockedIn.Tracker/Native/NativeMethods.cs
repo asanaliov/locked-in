@@ -18,6 +18,19 @@ internal static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static partial bool GetLastInputInfo(ref LastInputInfo info);
 
+    internal const uint ProcessQueryLimitedInformation = 0x1000;
+
+    [LibraryImport("kernel32.dll")]
+    internal static partial IntPtr OpenProcess(uint access, [MarshalAs(UnmanagedType.Bool)] bool inheritHandle, uint processId);
+
+    [LibraryImport("kernel32.dll", EntryPoint = "QueryFullProcessImageNameW", StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool QueryFullProcessImageName(IntPtr process, uint flags, [Out] char[] path, ref uint size);
+
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool CloseHandle(IntPtr handle);
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct LastInputInfo
     {
