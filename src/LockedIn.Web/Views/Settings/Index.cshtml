@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Settings";
     var general = Model.General;
-    var accentSwatches = new Dictionary<Accent, string> { [Accent.Indigo] = "#6d6ef7", [Accent.Sky] = "#0ea5e9", [Accent.Orchid] = "#d946ef" };
+    var accentSwatches = new Dictionary<Accent, string> { [Accent.Blue] = "#0071e3", [Accent.Graphite] = "#6e6e73", [Accent.Orange] = "#ff9500" };
     string Minutes(int m) => m == 1 ? "1 minute" : $"{m} minutes";
     string Seconds(int s) => s < 60 ? $"{s} seconds" : Minutes(s / 60);
 }

@@ -13,29 +13,29 @@
     }
 </div>
 
-<div class="card">
+<div class="card" style="padding: 0">
     @if (Model.Metrics.Apps.Count == 0)
     {
         <div class="empty">No apps tracked in this period.</div>
     }
     else
     {
-        <table>
-            <thead>
-                <tr><th>App</th><th>Category</th><th style="width: 40%"></th><th class="num">Time</th><th class="num">Share</th></tr>
-            </thead>
-            <tbody>
-                @foreach (var app in Model.Metrics.Apps)
-                {
-                    <tr>
-                        <td>@app.AppName</td>
-                        <td><span class="dot @app.Category"></span>@app.Category</td>
-                        <td><div class="bar @app.Category" style="width: @((app.Time / longest * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div></td>
-                        <td class="num">@Format.Duration(app.Time)</td>
-                        <td class="num muted">@Format.Percent(app.Time / Model.Metrics.ActiveTime)</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <ul class="app-list">
+            @foreach (var app in Model.Metrics.Apps)
+            {
+                <li class="app-row">
+                    <div class="app-icon @app.Category" aria-hidden="true">@app.AppName[..1].ToUpperInvariant()</div>
+                    <div>
+                        <div class="app-name">@app.AppName</div>
+                        <div class="app-sub">@app.Category</div>
+                    </div>
+                    <div class="bar-cell"><div class="bar @app.Category" style="width: @((app.Time / longest * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div></div>
+                    <div class="app-time">
+                        @Format.Duration(app.Time)
+                        <small>@Format.Percent(app.Time / Model.Metrics.ActiveTime)</small>
+                    </div>
+                </li>
+            }
+        </ul>
     }
 </div>

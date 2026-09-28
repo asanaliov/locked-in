@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html lang="en"
       data-theme="@(appearance.Theme == Theme.System ? null : appearance.Theme.ToString().ToLowerInvariant())"
-      data-accent="@(appearance.Accent == Accent.Indigo ? null : appearance.Accent.ToString().ToLowerInvariant())"
+      data-accent="@(appearance.Accent == Accent.Blue ? null : appearance.Accent.ToString().ToLowerInvariant())"
       data-motion="@(appearance.Animations ? null : "off")">
 <head>
     <meta charset="utf-8" />
@@ -44,11 +44,13 @@
                 </svg>
                 locked-in
             </a>
-            <a class="@Active("Today")" asp-controller="Today" asp-action="Index">Today</a>
-            <a class="@Active("ScreenTime")" asp-controller="ScreenTime" asp-action="Index">Screen time</a>
-            <a class="@Active("History")" asp-controller="History" asp-action="Index">Last 7 days</a>
-            <a class="@Active("Apps")" asp-controller="Apps" asp-action="Index">Top apps</a>
-            <a class="@Active("Settings")" asp-controller="Settings" asp-action="Index">Settings</a>
+            <div class="nav-links">
+                <a class="@Active("Today")" asp-controller="Today" asp-action="Index">Today</a>
+                <a class="@Active("ScreenTime")" asp-controller="ScreenTime" asp-action="Index">Screen time</a>
+                <a class="@Active("History")" asp-controller="History" asp-action="Index">Last 7 days</a>
+                <a class="@Active("Apps")" asp-controller="Apps" asp-action="Index">Top apps</a>
+                <a class="@Active("Settings")" asp-controller="Settings" asp-action="Index">Settings</a>
+            </div>
         </nav>
     </header>
     <main>
