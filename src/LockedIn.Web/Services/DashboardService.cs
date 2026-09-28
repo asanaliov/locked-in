@@ -26,6 +26,14 @@ public sealed class DashboardService(
         return DayMetricsCalculator.Calculate(sessions, options.Value.StreakInterruptionTolerance);
     }
 
+    public async Task<double[]> GetMinutesPerHourAsync(DateOnly day, CancellationToken cancellationToken)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
+        var (fromUtc, toUtc) = SessionQueries.UtcRange(day);
+        var sessions = await db.LoadClippedAsync(fromUtc, toUtc, currentSession, cancellationToken);
+        return HourlyUsageCalculator.MinutesPerHour(sessions);
+    }
+
     public async Task<IReadOnlyList<DaySummary>> GetLastDaysAsync(int count, CancellationToken cancellationToken)
     {
         var days = new List<DaySummary>(count);
