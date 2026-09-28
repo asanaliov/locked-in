@@ -9,6 +9,7 @@
     <RootNamespace>LockedIn.App</RootNamespace>
     <ApplicationIcon>lockedin.ico</ApplicationIcon>
     <Product>locked-in</Product>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,14 +1,29 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
+using Microsoft.Win32;
 
 namespace LockedIn.App;
 
 /// <summary>The app window: the dashboard rendered by WebView2. Links to other sites open in the browser.</summary>
-internal sealed class MainWindow : Form
+internal sealed partial class MainWindow : Form
 {
     private static readonly string WebViewDataFolder =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LockedIn", "WebView2");
+
+    // Match --bg, --text and --border in site.css so the title bar blends into the dashboard header.
+    private static readonly (Color Background, Color Text, Color Border) LightTheme =
+        (ColorTranslator.FromHtml("#f3f4fb"), ColorTranslator.FromHtml("#171a33"), ColorTranslator.FromHtml("#e2e4f1"));
+    private static readonly (Color Background, Color Text, Color Border) DarkTheme =
+        (ColorTranslator.FromHtml("#0f1226"), ColorTranslator.FromHtml("#e9eaf5"), ColorTranslator.FromHtml("#272c52"));
+
+    private const int DwmwaUseImmersiveDarkMode = 20;
+    private const int DwmwaWindowCornerPreference = 33;
+    private const int DwmwaBorderColor = 34;
+    private const int DwmwaCaptionColor = 35;
+    private const int DwmwaTextColor = 36;
+    private const int DwmwcpRound = 2;
 
     private readonly WebView2 _webView = new() { Dock = DockStyle.Fill };
     private readonly Uri _dashboard;
@@ -24,8 +39,58 @@ internal sealed class MainWindow : Form
         StartPosition = FormStartPosition.CenterScreen;
         Controls.Add(_webView);
 
+        ApplyTheme();
+        SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
         Load += async (_, _) => await ShowDashboardAsync();
     }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        ApplyTheme();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+            SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
+        base.Dispose(disposing);
+    }
+
+    private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+    {
+        if (e.Category == UserPreferenceCategory.General)
+            BeginInvoke(ApplyTheme);
+    }
+
+    private void ApplyTheme()
+    {
+        var dark = IsDarkMode();
+        var theme = dark ? DarkTheme : LightTheme;
+
+        BackColor = theme.Background;
+        _webView.DefaultBackgroundColor = theme.Background;
+
+        if (!IsHandleCreated)
+            return;
+
+        // Windows 10 ignores the colour attributes and just gets a dark or light title bar.
+        SetWindowAttribute(DwmwaUseImmersiveDarkMode, dark ? 1 : 0);
+        SetWindowAttribute(DwmwaWindowCornerPreference, DwmwcpRound);
+        SetWindowAttribute(DwmwaCaptionColor, ColorTranslator.ToWin32(theme.Background));
+        SetWindowAttribute(DwmwaTextColor, ColorTranslator.ToWin32(theme.Text));
+        SetWindowAttribute(DwmwaBorderColor, ColorTranslator.ToWin32(theme.Border));
+    }
+
+    private void SetWindowAttribute(int attribute, int value) =>
+        DwmSetWindowAttribute(Handle, attribute, ref value, sizeof(int));
+
+    private static bool IsDarkMode() =>
+        Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+            "AppsUseLightTheme", 1) is 0;
+
+    [LibraryImport("dwmapi.dll")]
+    private static partial int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
 
     private async Task ShowDashboardAsync()
     {
