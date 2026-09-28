@@ -89,7 +89,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         {
             // Off the UI thread so the database call never blocks the message loop.
             var live = await Task.Run(() => _status.GetAsync(CancellationToken.None));
-            _icon.Text = $"locked-in · {LockInStages.For(live.Score).Name} ({live.Score}) · streak {Format.Duration(live.CurrentStreak)}";
+            _icon.Text = $"Locked In · {LockInStages.For(live.Score).Name} ({live.Score}) · streak {Format.Duration(live.CurrentStreak)}";
         }
         catch (Exception)
         {

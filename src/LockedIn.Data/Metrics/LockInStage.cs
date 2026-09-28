@@ -1,6 +1,6 @@
 namespace LockedIn.Data.Metrics;
 
-/// <summary>A named band of the Locked-In Score, shown with its brain image on the dashboard.</summary>
+/// <summary>A named band of the Locked In Score, shown with its brain image on the dashboard.</summary>
 public sealed record LockInStage(int Level, string Name, int MinScore);
 
 public static class LockInStages
