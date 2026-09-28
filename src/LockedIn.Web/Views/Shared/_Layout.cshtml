@@ -32,6 +32,9 @@
     <main>
         @RenderBody()
     </main>
-    <footer>All data stays on this machine. The session you're in right now shows up once you switch apps or go idle.</footer>
+    <footer>
+        <p>All data stays on this machine. The session you're in right now shows up once you switch apps or go idle.</p>
+        <p>locked-in v@(typeof(Program).Assembly.GetName().Version?.ToString(3)) · made by <a href="https://github.com/asanaliov">Asan</a> · <a href="https://github.com/asanaliov/locked-in">source</a></p>
+    </footer>
 </body>
 </html>

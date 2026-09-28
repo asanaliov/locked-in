@@ -134,6 +134,10 @@ so its logic is unit tested with fakes and no Windows API calls.
 - [ ] Installer (MSIX or winget)
 - [ ] macOS and Linux support
 
+## Author
+
+Made by **Asan** ([@asanaliov](https://github.com/asanaliov)).
+
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © 2026 Asan
