@@ -1,33 +1,37 @@
-using LockedIn.Tracker.Windows;
+using LockedIn.Data;
+using LockedIn.Tracker.Sessions;
 using Microsoft.Extensions.Options;
 
 namespace LockedIn.Tracker;
 
 public sealed class Worker(
-    IActiveWindowProvider windows,
-    IIdleDetector idleDetector,
+    SessionTracker tracker,
+    IServiceProvider services,
     IOptions<TrackerOptions> options,
     ILogger<Worker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var settings = options.Value;
-        var wasIdle = false;
+        await services.InitializeLockedInDatabaseAsync(stoppingToken);
 
-        using var timer = new PeriodicTimer(settings.PollInterval);
+        using var timer = new PeriodicTimer(options.Value.PollInterval);
         do
         {
-            var isIdle = idleDetector.GetIdleTime() > settings.IdleThreshold;
-            if (isIdle != wasIdle)
-                logger.LogInformation(isIdle ? "Went idle" : "Input returned");
-            wasIdle = isIdle;
-
-            if (isIdle)
-                continue;
-
-            var window = windows.GetActiveWindow();
-            logger.LogInformation("Active: {App} | {Title}", window?.AppName, window?.Title);
+            try
+            {
+                await tracker.TickAsync(stoppingToken);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                logger.LogError(ex, "Tracking tick failed");
+            }
         }
         while (await timer.WaitForNextTickAsync(stoppingToken));
+    }
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await base.StopAsync(cancellationToken);
+        await tracker.FlushAsync(CancellationToken.None);
     }
 }

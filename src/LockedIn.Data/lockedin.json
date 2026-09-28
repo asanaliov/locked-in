@@ -1,8 +1,10 @@
 {
   "LockedIn": {
+    "DatabasePath": "%LOCALAPPDATA%\\LockedIn\\data.db",
     "Tracker": {
       "PollInterval": "00:00:03",
-      "IdleThreshold": "00:02:00"
+      "IdleThreshold": "00:02:00",
+      "StoreWindowTitles": false
     }
   }
 }
