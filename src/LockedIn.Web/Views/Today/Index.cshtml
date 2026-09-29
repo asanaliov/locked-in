@@ -43,10 +43,16 @@
 
     @if (Model.ActiveTime == TimeSpan.Zero)
     {
-        <div class="card empty span-4">Nothing tracked yet today. Is the tracker running?</div>
+        <div class="card empty span-4">
+            <img src="~/_content/LockedIn.Web/img/empty-state.svg" alt="A brain with a thought bubble, wondering where to start" />
+            <p class="empty-title">Nothing tracked yet today</p>
+            <p>Pondering where to start? Open an app and get going. Your day shows up here as you work.</p>
+        </div>
     }
     else
     {
+        <partial name="_StageLadder" model="Model.Score" />
+
         <div class="card span-4">
             <h2>Breakdown</h2>
             <partial name="_CategoryBreakdown" model="Model" />

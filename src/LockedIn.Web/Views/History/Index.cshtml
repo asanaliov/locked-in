@@ -16,6 +16,7 @@
             <tr>
                 <th>Day</th>
                 <th class="num">Score</th>
+                <th>Stage</th>
                 <th class="num">Active</th>
                 <th class="num">Focus</th>
                 <th class="num">Distraction</th>
@@ -28,6 +29,12 @@
                 <tr>
                     <td>@day.Day.ToString("ddd d MMM")</td>
                     <td class="num"><strong>@day.Metrics.Score</strong></td>
+                    <td>
+                        @{ var stage = LockInStages.For(day.Metrics.Score); }
+                        <span class="stage-chip">
+                            <img src="~/_content/LockedIn.Web/img/stages/stage-@(stage.Level).svg" alt="" />@stage.Name
+                        </span>
+                    </td>
                     <td class="num">@Format.Duration(day.Metrics.ActiveTime)</td>
                     <td class="num">@Format.Duration(day.Metrics.FocusTime)</td>
                     <td class="num">@Format.Duration(day.Metrics.DistractionTime)</td>
