@@ -91,7 +91,7 @@ dotnet publish src/LockedIn.App -c Release -r win-x64 --self-contained -o artifa
 ```
 
 ```bash
-iscc /DAppVersion=0.3.0 installer/LockedIn.iss
+iscc /DAppVersion=0.4.0 installer/LockedIn.iss
 ```
 
 Pushing a `v*` tag runs the [release workflow](.github/workflows/release.yml), which builds the
