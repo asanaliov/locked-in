@@ -7,21 +7,18 @@
         FontFamily="{StaticResource UiFont}" FontSize="14"
         UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
     <DockPanel>
-        <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1" Padding="20,10">
-            <DockPanel>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Path Width="18" Height="18" Stretch="Uniform" Fill="{DynamicResource Accent}" Margin="0,0,8,0"
-                          Data="M21 30V21a11 11 0 0 1 22 0v9h-6.5v-9a4.5 4.5 0 0 0-9 0v9ZM21 28h22a9 9 0 0 1 9 9v12a9 9 0 0 1-9 9H21a9 9 0 0 1-9-9V37a9 9 0 0 1 9-9Z" />
-                    <TextBlock Text="Locked In" FontWeight="Bold" FontSize="15" />
-                </StackPanel>
-                <StackPanel x:Name="Nav" Orientation="Horizontal" HorizontalAlignment="Right">
+        <!-- The title bar already shows the icon and name, so the header is just the navigation,
+             lined up with the page content below (the first pill's text starts where the page title does). -->
+        <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1" Padding="0,8">
+            <Grid MaxWidth="960" Margin="24,0">
+                <StackPanel x:Name="Nav" Orientation="Horizontal" Margin="-16,0,0,0">
                     <RadioButton Content="Today" Tag="Today" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
                     <RadioButton Content="Screen time" Tag="ScreenTime" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
                     <RadioButton Content="Last 7 days" Tag="History" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
                     <RadioButton Content="Top apps" Tag="Apps" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
                     <RadioButton Content="Settings" Tag="Settings" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
                 </StackPanel>
-            </DockPanel>
+            </Grid>
         </Border>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
