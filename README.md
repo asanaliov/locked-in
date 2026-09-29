@@ -8,17 +8,19 @@ A small Windows app that tracks your screen time and focus. It lives in the syst
 records which app you're using, sorts each one into **Focus**, **Neutral** or **Distraction**, and
 gives you a daily **Locked In Score** from 0 to 100 that says how focused you really were.
 
-![The Locked In window showing today's score, focus breakdown and time per app (demo data)](docs/screenshot.png)
+![The Locked In window showing today's score, stats and stage of locked in (demo data)](docs/screenshot.png)
 
 ## Features
 
-- **One Windows app** (`LockedIn.exe`) with a tray icon and its own window, installed with a normal setup wizard
+- **One small native Windows app** (`LockedIn.exe`) with a tray icon and its own window, installed with a normal setup wizard
 - **Background tracking** that checks the foreground window every 3 seconds and uses almost no battery
 - **Idle detection**: after 2 minutes without keyboard or mouse input it stops counting
 - **Categories** from simple rules: process names, plus title keywords for browsers
   (a YouTube tab is a distraction, a GitHub tab is focus)
 - **Locked In Score**, focus ratio, longest deep work streak and context switches per hour
-- **Dashboard window**: today, the last 7 days, top apps, and per-app category settings
+- **Dashboard window**: today with your score and stage, screen time by hour and day, the last 7 days, top apps with their real icons, and settings
+- **Stages of locked in**: Brain idle, Warming up, In the zone and, from a score of 75, Locked in
+- **Settings** for light, dark or system theme, accent colour, animations, idle time, window titles and streak breaks
 - **Tray icon** showing today's score and your current streak on hover, with an optional "Start with Windows"
 - **Private by default**: everything stays in one local SQLite file, and window titles aren't saved
 
@@ -51,8 +53,7 @@ All the weights live in one class, [`LockedInScoreCalculator`](src/LockedIn.Data
 3. Locked In opens its window and starts tracking. Closing the window keeps it running in the tray;
    right-click the tray icon to reopen it, turn **Start with Windows** on or off, or exit.
 
-The window uses the Microsoft Edge WebView2 Runtime, which is built into Windows 11 and most
-up-to-date Windows 10 PCs. To uninstall, use **Settings → Apps**. Your tracking data in
+To uninstall, use **Settings → Apps**. Your tracking data in
 `%LOCALAPPDATA%\LockedIn` is kept; delete that folder to remove it too.
 
 ## Build from source
@@ -111,22 +112,24 @@ past sessions.
 ```
 LockedIn.sln
 ├── src/
-│   ├── LockedIn.App/        LockedIn.exe: hosts the tracker and dashboard in one process,
-│   │                        tray icon, WebView2 window, single instance, start with Windows
+│   ├── LockedIn.App/        LockedIn.exe: WPF window and tray icon hosting the tracker in one process
+│   │   ├── Views/           The pages: Today, Screen time, Last 7 days, Top apps, Settings
+│   │   ├── Controls/        Hand-drawn score ring, bars and column chart
+│   │   ├── Services/        Reads metrics and saves settings for the pages
+│   │   └── Theming/         Light and dark palettes, accents and animations
 │   ├── LockedIn.Data/       EF Core DbContext, entities and migrations (SQLite),
 │   │                        classification rules, metrics and the score calculator
 │   ├── LockedIn.Tracker/    Background tracking: polling, idle detection, session saving
 │   │   ├── Native/          NativeMethods.cs, the only place with P/Invoke (user32.dll)
 │   │   ├── Windows/         IActiveWindowProvider and IIdleDetector with their Win32 versions
 │   │   └── Sessions/        SessionTracker (the core logic) and the SQLite session store
-│   └── LockedIn.Web/        Dashboard as a Razor class library (MVC views + Chart.js)
 ├── installer/               Inno Setup script
 └── tests/
     └── LockedIn.Tests/      xUnit tests for session logic, classification, streaks and the score
 ```
 
-The dashboard is served by ASP.NET Core inside the app on a private `127.0.0.1` port and shown in
-a WebView2 window. The tracker only talks to Windows through `IActiveWindowProvider`, `IIdleDetector` and `IClock`,
+The window is plain WPF, drawn by the app itself: no browser engine, no web server and no chart library.
+The tracker only talks to Windows through `IActiveWindowProvider`, `IIdleDetector` and `IClock`,
 so its logic is unit tested with fakes and no Windows API calls.
 
 ## Privacy
@@ -135,14 +138,25 @@ so its logic is unit tested with fakes and no Windows API calls.
   network calls from the tracker.
 - Window titles are only used to classify browser tabs and are **not saved** unless you turn on
   `StoreWindowTitles`.
-- The dashboard is only reachable from your own machine (`127.0.0.1`). Its one external request is
-  loading Chart.js from the jsDelivr CDN; no tracking data goes with it. Links to other sites open
-  in your normal browser.
+- The app makes no network requests at all. The only links, to the source and the author, open in your normal browser.
 - To delete everything, remove `%LOCALAPPDATA%\LockedIn`.
+
+## Efficiency
+
+Locked In is built to sit in the tray all day without you noticing it. Measured on the Release build:
+
+| State | CPU | Memory (private) |
+| --- | --- | --- |
+| In the tray, tracking | about 0.2 % of one core | about 27 MB |
+| Window open | about 0.5 % of one core once loaded | about 85 MB |
+| Window closed again | back to tray levels | memory handed back to Windows |
+
+It checks the foreground window every 3 seconds with a single cached Win32 lookup, writes to the
+database only when something changes, and draws the window in software instead of loading the GPU driver.
+Closing the window frees it; the tooltip only reads your score when you hover the tray icon.
 
 ## Roadmap
 
-- [ ] Bundle Chart.js locally so the dashboard works fully offline
 - [ ] Daily focus goal with a gentle tray notification
 - [ ] Pick any day on the Today page
 - [ ] CSV export
