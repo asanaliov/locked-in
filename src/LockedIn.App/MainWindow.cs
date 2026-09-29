@@ -48,6 +48,7 @@ internal sealed partial class MainWindow : Form
         SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
         _appearanceChanged = appearance.OnChange(_ => ApplyThemeFromAnyThread());
         Load += async (_, _) => await ShowDashboardAsync();
+        Resize += async (_, _) => await PauseWhileMinimizedAsync();
     }
 
     protected override void OnHandleCreated(EventArgs e)
@@ -147,6 +148,32 @@ internal sealed partial class MainWindow : Form
             OpenInBrowser(e.Uri);
         };
         _webView.Source = _dashboard;
+    }
+
+    /// <summary>
+    /// A minimized dashboard doesn't need a live browser: suspend it so Chromium stops using CPU and trims memory.
+    /// Restoring resumes it and reloads so the numbers are fresh.
+    /// </summary>
+    private async Task PauseWhileMinimizedAsync()
+    {
+        if (_webView.CoreWebView2 is not { } core)
+            return;
+
+        var minimized = WindowState == FormWindowState.Minimized;
+        if (_webView.Visible != minimized)
+            return; // already in the right state
+
+        _webView.Visible = !minimized;
+        if (minimized)
+        {
+            core.MemoryUsageTargetLevel = CoreWebView2MemoryUsageTargetLevel.Low;
+            await core.TrySuspendAsync();
+        }
+        else
+        {
+            core.MemoryUsageTargetLevel = CoreWebView2MemoryUsageTargetLevel.Normal;
+            core.Reload();
+        }
     }
 
     private bool IsDashboard(string url) =>

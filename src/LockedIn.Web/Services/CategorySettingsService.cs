@@ -9,7 +9,10 @@ public sealed record AppCategoryRow(string AppName, Category DefaultCategory, Ca
     public Category Effective => Override ?? DefaultCategory;
 }
 
-public sealed class CategorySettingsService(IDbContextFactory<LockedInDbContext> dbFactory, CategoryRules rules)
+public sealed class CategorySettingsService(
+    IDbContextFactory<LockedInDbContext> dbFactory,
+    CategoryRules rules,
+    ICategoryOverrides overrides)
 {
     /// <summary>Every app that was tracked, has a default rule, or has an override.</summary>
     public async Task<IReadOnlyList<AppCategoryRow>> GetAppsAsync(CancellationToken cancellationToken)
@@ -52,6 +55,7 @@ public sealed class CategorySettingsService(IDbContextFactory<LockedInDbContext>
                 break;
         }
         await db.SaveChangesAsync(cancellationToken);
+        overrides.Invalidate();
 
         if (!rules.Browsers.Contains(appName))
         {

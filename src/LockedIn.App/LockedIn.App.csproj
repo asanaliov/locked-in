@@ -10,6 +10,12 @@
     <ApplicationIcon>lockedin.ico</ApplicationIcon>
     <Product>Locked In</Product>
     <AssemblyTitle>Locked In</AssemblyTitle>
+    <!-- Battery and memory: this is a tray app, not a server. Workstation GC without the background GC thread
+         keeps the heap small, and ReadyToRun skips most JIT work at every start. -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 

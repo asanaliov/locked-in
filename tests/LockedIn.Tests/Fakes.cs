@@ -33,6 +33,8 @@ internal sealed class FakeOverrides : ICategoryOverrides
     public Dictionary<string, Category> Overrides { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public Category? Find(string appName) => Overrides.TryGetValue(appName, out var category) ? category : null;
+
+    public void Invalidate() { }
 }
 
 internal sealed class FakeIconCache : IAppIconCache
