@@ -2,7 +2,7 @@ using LockedIn.Data;
 using LockedIn.Data.Classification;
 using Microsoft.EntityFrameworkCore;
 
-namespace LockedIn.Web.Services;
+namespace LockedIn.App.Services;
 
 public sealed record AppCategoryRow(string AppName, Category DefaultCategory, Category? Override, bool IsBrowser)
 {

@@ -1,10 +1,11 @@
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using LockedIn.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace LockedIn.Web.Services;
+namespace LockedIn.App.Services;
 
 public sealed record GeneralSettings(
     Theme Theme,

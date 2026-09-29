@@ -1,17 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- LockedIn.exe: tray icon + app window, hosting the tracker and the dashboard in one process. -->
+  <!-- LockedIn.exe: tray icon + native WPF window, hosting the tracker in one small process. -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <!-- Only for the tray icon: WPF has no NotifyIcon of its own. -->
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>LockedIn</AssemblyName>
     <RootNamespace>LockedIn.App</RootNamespace>
     <ApplicationIcon>lockedin.ico</ApplicationIcon>
     <Product>Locked In</Product>
     <AssemblyTitle>Locked In</AssemblyTitle>
-    <!-- Battery and memory: this is a tray app, not a server. Workstation GC without the background GC thread
-         keeps the heap small, and ReadyToRun skips most JIT work at every start. -->
+    <!-- Battery and memory: workstation GC without the background GC thread keeps the heap small,
+         and ReadyToRun skips most JIT work at every start. -->
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
     <PublishReadyToRun>true</PublishReadyToRun>
@@ -20,20 +22,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LockedIn.Data\LockedIn.Data.csproj" />
-    <ProjectReference Include="..\LockedIn.Tracker\LockedIn.Tracker.csproj" />
-    <ProjectReference Include="..\LockedIn.Web\LockedIn.Web.csproj" />
+    <!-- Program.Main starts the app, so App.xaml only carries the shared resources. -->
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
+    <Resource Include="Assets\*.png" />
+    <Resource Include="lockedin.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+    <!-- WinForms is only used by the tray; keep its names from clashing with WPF's. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
   </ItemGroup>
 
-  <!-- The WebView2 package always references its WPF control, which clashes with WinForms. We only use the WinForms one. -->
-  <Target Name="RemoveWebView2Wpf" BeforeTargets="ResolveAssemblyReferences">
-    <ItemGroup>
-      <Reference Remove="@(Reference)" Condition="'%(Filename)' == 'Microsoft.Web.WebView2.Wpf'" />
-    </ItemGroup>
-  </Target>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LockedIn.Data\LockedIn.Data.csproj" />
+    <ProjectReference Include="..\LockedIn.Tracker\LockedIn.Tracker.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ using LockedIn.Data.Metrics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace LockedIn.Web.Services;
+namespace LockedIn.App.Services;
 
 public sealed record DaySummary(DateOnly Day, DayMetrics Metrics);
 

@@ -1,21 +1,22 @@
+using LockedIn.App.Services;
 using LockedIn.App.Tray;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using LockedIn.Tracker;
 using LockedIn.Tracker.Windows;
-using LockedIn.Web;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace LockedIn.App;
 
-/// <summary>The in-process host: background tracker plus the dashboard on a private loopback port.</summary>
+/// <summary>The in-process host: the background tracker plus the services the window reads from.</summary>
 internal static class LockedInHost
 {
-    public static WebApplication Build()
+    public static IHost Build()
     {
         // Started from the Run key the working directory is System32, so pin the content root.
-        var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory });
-        builder.WebHost.UseStaticWebAssets(); // serves the dashboard's CSS under `dotnet run`; no-op once published
-        builder.WebHost.UseUrls("http://127.0.0.1:0"); // loopback only, on any free port
+        var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings { ContentRootPath = AppContext.BaseDirectory });
         builder.Configuration.AddLockedInSettings();
 
         // No console in a tray app; only warnings and errors go to the Windows event log.
@@ -27,18 +28,16 @@ internal static class LockedInHost
         builder.Services.AddLockedInDatabase(builder.Configuration);
         builder.Services.AddLockedInTracker(builder.Configuration);
         builder.Services.AddSingleton<IAppIconCache, AppIconCache>();
-        builder.Services.AddLockedInDashboard();
         builder.Services.AddSingleton<LiveStatusProvider>();
-
-        var app = builder.Build();
-        app.MapStaticAssets();
-        app.MapLockedInDashboard();
-        return app;
+        builder.Services.AddSingleton<DashboardService>();
+        builder.Services.AddSingleton<CategorySettingsService>();
+        builder.Services.AddSingleton<GeneralSettingsService>();
+        return builder.Build();
     }
 
-    public static async Task StartAsync(WebApplication app)
+    public static async Task StartAsync(IHost host)
     {
-        await app.Services.InitializeLockedInDatabaseAsync();
-        await app.StartAsync();
+        await host.Services.InitializeLockedInDatabaseAsync();
+        await host.StartAsync();
     }
 }
