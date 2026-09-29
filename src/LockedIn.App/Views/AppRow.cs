@@ -6,7 +6,8 @@ using LockedIn.Data.Metrics;
 namespace LockedIn.App.Views;
 
 /// <summary>One line of an app list, shown with the shared "AppRow" template.</summary>
-public sealed record AppRow(string AppName, Category Category, string Time, string? Sub, string? Detail, IReadOnlyList<BarSegment> Bar, double Total)
+/// <param name="ExactTime">Shown on hover, to the second.</param>
+public sealed record AppRow(string AppName, Category Category, string Time, string ExactTime, string? Sub, string? Detail, IReadOnlyList<BarSegment> Bar, double Total)
 {
     public bool HasSub => Sub is not null;
     public bool HasDetail => Detail is not null;
@@ -20,6 +21,7 @@ public sealed record AppRow(string AppName, Category Category, string Time, stri
                 app.AppName,
                 app.Category,
                 Format.Duration(app.Time),
+                $"{app.AppName} · {Format.Exact(app.Time)}",
                 withCategoryAndShare ? app.Category.ToString() : null,
                 withCategoryAndShare && activeTime > TimeSpan.Zero ? Format.Percent(app.Time / activeTime) : null,
                 [new BarSegment(app.Time.TotalMinutes, barBrush(app))],

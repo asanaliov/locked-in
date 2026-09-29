@@ -1,12 +1,14 @@
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
 namespace LockedIn.App.Controls;
 
 /// <param name="Segments">Stacked from the bottom up.</param>
-/// <param name="Tooltip">Shown while hovering the column.</param>
+/// <param name="Tooltip">Shown next to the pointer while hovering the column.</param>
 public sealed record ChartColumn(string Label, IReadOnlyList<BarSegment> Segments, string Tooltip);
 
 /// <summary>
@@ -26,6 +28,12 @@ public sealed class ColumnChart : FrameworkElement
     private double _max;
     private Func<double, string> _formatAxis = v => v.ToString("0", CultureInfo.CurrentCulture);
     private int _labelEvery = 1;
+    private int? _hovered;
+
+    // One tooltip that follows the pointer from column to column; a plain ToolTip property only opens on entering the chart.
+    private readonly ToolTip _tooltip = new() { Placement = PlacementMode.Relative };
+
+    public ColumnChart() => _tooltip.PlacementTarget = this;
 
     public void SetData(
         IReadOnlyList<ChartColumn> columns,
@@ -53,8 +61,33 @@ public sealed class ColumnChart : FrameworkElement
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
-        var index = ColumnAt(e.GetPosition(this).X);
-        ToolTip = index is { } i ? _columns[i].Tooltip : null;
+        var position = e.GetPosition(this);
+        var index = ColumnAt(position.X);
+        if (index != _hovered)
+        {
+            _hovered = index;
+            InvalidateVisual();
+        }
+
+        if (index is { } i)
+        {
+            _tooltip.Content = _columns[i].Tooltip;
+            _tooltip.HorizontalOffset = position.X + 14;
+            _tooltip.VerticalOffset = position.Y + 18;
+            _tooltip.IsOpen = true;
+        }
+        else
+        {
+            _tooltip.IsOpen = false;
+        }
+    }
+
+    protected override void OnMouseLeave(MouseEventArgs e)
+    {
+        base.OnMouseLeave(e);
+        _tooltip.IsOpen = false;
+        _hovered = null;
+        InvalidateVisual();
     }
 
     protected override void OnRender(DrawingContext context)
@@ -66,6 +99,12 @@ public sealed class ColumnChart : FrameworkElement
         var gridPen = new Pen((Brush)FindResource("Border"), 1);
         var plot = PlotArea();
         var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        var slot = plot.Width / _columns.Count;
+
+        // Transparent fill so the pointer is tracked between the bars too, not only over them.
+        context.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
+        if (_hovered is { } hovered)
+            context.DrawRoundedRectangle((Brush)FindResource("Raised"), null, new Rect(plot.Left + slot * hovered + 2, plot.Top, slot - 4, plot.Height), 6, 6);
 
         // Background context: horizontal grid lines with their values.
         for (var i = 0; i <= GridLines; i++)
@@ -77,7 +116,6 @@ public sealed class ColumnChart : FrameworkElement
             context.DrawText(text, new Point(plot.Left - text.Width - 8, y - text.Height / 2));
         }
 
-        var slot = plot.Width / _columns.Count;
         var barWidth = Math.Min(slot * 0.6, 34);
         for (var i = 0; i < _columns.Count; i++)
         {

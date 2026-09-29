@@ -166,7 +166,7 @@
 
     <!-- One app: icon, name, a bar scaled to the longest app, and its time. Shared by Today, Screen time and Top apps. -->
     <DataTemplate x:Key="AppRow">
-        <Grid Margin="0,5">
+        <Grid Margin="0,5" Background="Transparent" ToolTip="{Binding ExactTime}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="44" />
                 <ColumnDefinition Width="180" />
@@ -185,6 +185,24 @@
             </StackPanel>
         </Grid>
     </DataTemplate>
+
+    <!-- Tooltips in the app's colours instead of the system's light yellow-grey. -->
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource Card}" />
+        <Setter Property="Foreground" Value="{DynamicResource Text}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                            CornerRadius="8" Padding="10,6">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <!-- A thin scrollbar that fits both themes -->
     <Style TargetType="ScrollBar">
