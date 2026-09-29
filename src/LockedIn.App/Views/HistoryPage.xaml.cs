@@ -58,7 +58,13 @@ public partial class HistoryPage : UserControl, IPage
                     new BarSegment(day.Metrics.NeutralTime.TotalHours, neutral),
                     new BarSegment(day.Metrics.DistractionTime.TotalHours, distraction),
                 ],
-                $"{day.Day:ddd d MMM}: {Format.Duration(day.Metrics.ActiveTime)} active, score {day.Metrics.Score}")).ToList(),
+                $"""
+                {day.Day:dddd d MMM} · score {day.Metrics.Score}
+                Active {Format.Exact(day.Metrics.ActiveTime)}
+                Focus {Format.Exact(day.Metrics.FocusTime)}
+                Neutral {Format.Exact(day.Metrics.NeutralTime)}
+                Distraction {Format.Exact(day.Metrics.DistractionTime)}
+                """)).ToList(),
             hours => $"{hours:0.#}h",
             line: week.Select(day => (double)day.Metrics.Score).ToList());
     }

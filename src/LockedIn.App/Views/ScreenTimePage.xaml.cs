@@ -49,7 +49,7 @@ public partial class ScreenTimePage : UserControl, IPage
             AppRow.From(today.Apps, today.ActiveTime, _ => accent));
 
         HoursChart.SetData(
-            hours.Select((minutes, hour) => new ChartColumn(HourLabel(hour), [new BarSegment(minutes, accent)], $"{HourLabel(hour)}: {Minutes(minutes)}")).ToList(),
+            hours.Select((minutes, hour) => new ChartColumn(HourLabel(hour), [new BarSegment(minutes, accent)], $"{HourRange(hour)} · {Exact(minutes)}")).ToList(),
             AxisMinutes,
             minimumMax: 60,
             labelEvery: 3,
@@ -60,7 +60,7 @@ public partial class ScreenTimePage : UserControl, IPage
             week.Select((day, i) => new ChartColumn(
                 day.Day.ToString("ddd"),
                 [new BarSegment(day.Metrics.ActiveTime.TotalMinutes, i == week.Count - 1 ? accent : faded)],
-                $"{day.Day:ddd d MMM}: {Format.Duration(day.Metrics.ActiveTime)}")).ToList(),
+                $"{day.Day:dddd d MMM} · {Format.Exact(day.Metrics.ActiveTime)}")).ToList(),
             AxisMinutes,
             reference: average > TimeSpan.Zero ? average.TotalMinutes : null,
             gridSteps: MinuteSteps);
@@ -74,7 +74,13 @@ public partial class ScreenTimePage : UserControl, IPage
         _ => $"{hour - 12}p",
     };
 
+    /// <summary>"9 AM – 10 AM", in the user's own clock format.</summary>
+    private static string HourRange(int hour) =>
+        $"{DateTime.Today.AddHours(hour):h tt} – {DateTime.Today.AddHours(hour + 1):h tt}";
+
     private static string Minutes(double minutes) => Format.Duration(TimeSpan.FromMinutes(minutes));
+
+    private static string Exact(double minutes) => Format.Exact(TimeSpan.FromMinutes(minutes));
 
     /// <summary>Axis labels land on round values, so whole hours read "3h" instead of "3h 00m".</summary>
     private static string AxisMinutes(double minutes) =>
