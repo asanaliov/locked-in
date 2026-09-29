@@ -22,3 +22,13 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --configuration Release
+
+      # Compiles the installer too, so a broken installer script shows up on the PR, not at release time.
+      - name: Build installer
+        shell: pwsh
+        run: |
+          dotnet publish src/LockedIn.App -c Release -r win-x64 --self-contained -o artifacts/publish -p:DebugType=none
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress }
+          & $iscc /DAppVersion=0.0.0 installer\LockedIn.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -56,6 +56,17 @@ All the weights live in one class, [`LockedInScoreCalculator`](src/LockedIn.Data
 To uninstall, use **Settings → Apps**. Your tracking data in
 `%LOCALAPPDATA%\LockedIn` is kept; delete that folder to remove it too.
 
+### Updates
+
+You only download the installer once. Locked In checks GitHub for a new release a couple of minutes
+after it starts and then once a day. When one is out, the tray shows a notification and an
+**Update to x.y.z** item, and Settings shows an **Update** button. One click downloads the new
+installer from this repository's releases, installs it silently and restarts Locked In. Your data
+and settings are kept.
+
+The check is a single request to GitHub with nothing about you or your usage in it. You can turn it
+off under **Settings → Updates** and use **Check now** whenever you like.
+
 ## Build from source
 
 You need Windows 10 or 11 and the [.NET 10 SDK](https://dotnet.microsoft.com/download).
@@ -99,6 +110,7 @@ You can override any value with environment variables, for example `LockedIn__Da
 | `Tracker:IdleThreshold` | `00:02:00` | No input for this long means idle |
 | `Tracker:StoreWindowTitles` | `false` | Save window titles with each session |
 | `Metrics:StreakInterruptionTolerance` | `00:00:30` | Breaks shorter than this don't end a streak |
+| `Updates:CheckAutomatically` | `true` | Check GitHub for a new release once a day |
 | `Categories:Apps` | Rider, VS Code, terminals → Focus; Explorer, Settings → Neutral; Discord, Steam → Distraction | Process name (without `.exe`) → category |
 | `Categories:Browsers` | Chrome, Edge, Firefox, … | Apps whose tab title is matched against the keywords |
 | `Categories:TitleKeywords` | `youtube` → Distraction, `github` / `stackoverflow` / `docs` → Focus, … | Keyword in the title → category |
@@ -138,7 +150,8 @@ so its logic is unit tested with fakes and no Windows API calls.
   network calls from the tracker.
 - Window titles are only used to classify browser tabs and are **not saved** unless you turn on
   `StoreWindowTitles`.
-- The app makes no network requests at all. The only links, to the source and the author, open in your normal browser.
+- The only network request is the daily update check to GitHub (see [Updates](#updates)); it sends
+  nothing about you and can be turned off. Links to the source and the author open in your normal browser.
 - To delete everything, remove `%LOCALAPPDATA%\LockedIn`.
 
 ## Efficiency

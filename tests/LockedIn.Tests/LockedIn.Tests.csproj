@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\LockedIn.Data\LockedIn.Data.csproj" />
     <ProjectReference Include="..\..\src\LockedIn.Tracker\LockedIn.Tracker.csproj" />
+    <ProjectReference Include="..\..\src\LockedIn.App\LockedIn.App.csproj" />
   </ItemGroup>
 
   <ItemGroup>

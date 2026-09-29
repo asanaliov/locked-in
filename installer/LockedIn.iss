@@ -1,6 +1,9 @@
 ; Inno Setup script for Locked In. Built by .github/workflows/release.yml:
 ;   dotnet publish src/LockedIn.App -c Release -r win-x64 --self-contained -o artifacts/publish
 ;   ISCC.exe /DAppVersion=1.2.3 installer\LockedIn.iss
+;
+; The app updates itself by running this installer with /VERYSILENT /SUPPRESSMSGBOXES /UPDATE=1:
+; setup then waits for the running app to exit and starts the new version when it's done.
 
 #ifndef AppVersion
   #define AppVersion "0.0.0"
@@ -23,8 +26,6 @@ DefaultDirName={autopf}\{#AppName}
 DisableProgramGroupPage=yes
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-; Matches the single-instance mutex in SingleInstance.cs, so setup asks to close a running copy.
-AppMutex=LockedIn.App
 LicenseFile=..\LICENSE
 SetupIconFile=..\src\LockedIn.App\lockedin.ico
 UninstallDisplayIcon={app}\{#AppExe}
@@ -56,8 +57,58 @@ Root: HKCU; Subkey: "{#RunKey}"; ValueType: string; ValueName: "LockedIn"; Value
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsUpdate
 
 [Code]
+// Matches the single-instance mutex in SingleInstance.cs.
+const
+  RunningMutex = 'LockedIn.App';
+
+function IsUpdate: Boolean;
+begin
+  Result := ExpandConstant('{param:update|0}') = '1';
+end;
+
+// Asks the user to exit Locked In from its tray icon until they do or cancel.
+function AppClosedByUser: Boolean;
+begin
+  Result := True;
+  while CheckForMutexes(RunningMutex) do
+    if SuppressibleMsgBox('Locked In is running. Exit it from its tray icon menu, then click Retry.',
+      mbError, MB_RETRYCANCEL, IDCANCEL) = IDCANCEL then
+    begin
+      Result := False;
+      Exit;
+    end;
+end;
+
+// An update is started by the app itself just before it exits, so give it up to 30 seconds.
+function AppExitedWithin(Seconds: Integer): Boolean;
+var
+  Waited: Integer;
+begin
+  Waited := 0;
+  while CheckForMutexes(RunningMutex) and (Waited < Seconds * 1000) do
+  begin
+    Sleep(250);
+    Waited := Waited + 250;
+  end;
+  Result := not CheckForMutexes(RunningMutex);
+end;
+
+function InitializeSetup: Boolean;
+begin
+  if IsUpdate then
+    Result := AppExitedWithin(30)
+  else
+    Result := AppClosedByUser;
+end;
+
+function InitializeUninstall: Boolean;
+begin
+  Result := AppClosedByUser;
+end;
+
 // The Run value may also have been set from the tray menu, so always remove it on uninstall.
 // Tracking data in %LOCALAPPDATA%\LockedIn is kept.
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);

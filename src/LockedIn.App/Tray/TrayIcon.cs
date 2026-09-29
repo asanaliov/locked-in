@@ -1,7 +1,10 @@
 using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
 using LockedIn.App.Theming;
+using LockedIn.App.Updates;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +23,8 @@ internal sealed class TrayIcon : IDisposable
 
     private readonly IServiceProvider _services;
     private readonly LiveStatusProvider _status;
+    private readonly UpdateService _updates;
+    private readonly Forms.ToolStripMenuItem _updateItem = new() { Visible = false };
     private readonly Forms.NotifyIcon _icon;
     private readonly RegisteredWaitHandle _activateWait;
     private MainWindow? _window;
@@ -29,6 +34,7 @@ internal sealed class TrayIcon : IDisposable
     {
         _services = services;
         _status = services.GetRequiredService<LiveStatusProvider>();
+        _updates = services.GetRequiredService<UpdateService>();
         ThemeManager.Initialize(services.GetRequiredService<IOptionsMonitor<AppearanceOptions>>());
 
         _icon = new Forms.NotifyIcon { Icon = AppIcon.Value, Text = "Locked In", Visible = true, ContextMenuStrip = BuildMenu() };
@@ -39,7 +45,10 @@ internal sealed class TrayIcon : IDisposable
                 ShowWindow();
         };
 
+        _icon.BalloonTipClicked += async (_, _) => await InstallUpdateAsync();
+
         var dispatcher = Dispatcher.CurrentDispatcher;
+        _updates.UpdateFound += update => dispatcher.BeginInvoke(() => OfferUpdate(update));
         _activateWait = ThreadPool.RegisterWaitForSingleObject(
             instance.ActivateRequested, (_, _) => dispatcher.BeginInvoke(ShowWindow), null, Timeout.Infinite, executeOnlyOnce: false);
 
@@ -64,12 +73,41 @@ internal sealed class TrayIcon : IDisposable
             startWithWindows.Checked = StartupRegistration.IsEnabled();
         };
 
+        _updateItem.Click += async (_, _) => await InstallUpdateAsync();
+
         var menu = new Forms.ContextMenuStrip();
+        menu.Items.Add(_updateItem);
         menu.Items.Add("Open Locked In", null, (_, _) => ShowWindow());
         menu.Items.Add(startWithWindows);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => Application.Current.Shutdown());
         return menu;
+    }
+
+    private void OfferUpdate(AvailableUpdate update)
+    {
+        _updateItem.Text = $"Update to {update.Version.ToString(3)}";
+        _updateItem.Visible = true;
+        _icon.ShowBalloonTip(10_000, "Update available", $"Locked In {update.Version.ToString(3)} is ready. Click to install it.", Forms.ToolTipIcon.Info);
+    }
+
+    private async Task InstallUpdateAsync()
+    {
+        if (_updates.Available is not { } update || !_updateItem.Enabled)
+            return;
+
+        _updateItem.Enabled = false;
+        _updateItem.Text = "Downloading update…";
+        try
+        {
+            await _updates.InstallAsync(update); // exits the app once the installer has started
+        }
+        catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException)
+        {
+            _updateItem.Enabled = true;
+            _updateItem.Text = $"Update to {update.Version.ToString(3)}";
+            _icon.ShowBalloonTip(10_000, "Update failed", "The update couldn't be downloaded. Try again later.", Forms.ToolTipIcon.Warning);
+        }
     }
 
     private void ShowWindow()
