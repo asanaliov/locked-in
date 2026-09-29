@@ -17,6 +17,10 @@ public sealed class LockInStagesTests
         Assert.Equal(expectedLevel, LockInStages.For(score).Level);
 
     [Fact]
+    public void Locked_in_is_the_top_stage() =>
+        Assert.Equal("Locked in", LockInStages.For(100).Name);
+
+    [Fact]
     public void Stages_cover_0_to_100_without_gaps()
     {
         var expectedMin = 0;
