@@ -1,8 +1,12 @@
+using System.IO;
+using System.Net.Http;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using LockedIn.App.Controls;
 using LockedIn.App.Services;
+using LockedIn.App.Updates;
 using LockedIn.Data;
 
 namespace LockedIn.App.Views;
@@ -19,12 +23,14 @@ public partial class SettingsPage : UserControl, IPage
 
     private readonly GeneralSettingsService _general;
     private readonly CategorySettingsService _categories;
+    private readonly UpdateService _updates;
     private GeneralSettings _settings = null!;
 
-    public SettingsPage(GeneralSettingsService general, CategorySettingsService categories)
+    public SettingsPage(GeneralSettingsService general, CategorySettingsService categories, UpdateService updates)
     {
         _general = general;
         _categories = categories;
+        _updates = updates;
         InitializeComponent();
     }
 
@@ -56,13 +62,66 @@ public partial class SettingsPage : UserControl, IPage
 
         Animations.IsChecked = _settings.Animations;
         StoreTitles.IsChecked = _settings.StoreWindowTitles;
+        CheckForUpdates.IsChecked = _settings.CheckForUpdates;
+        VersionText.Text = $"Locked In {UpdateService.CurrentVersion.ToString(3)}";
+        ShowUpdate(_updates.Available, checkedJustNow: false);
 
         var apps = await _categories.GetAppsAsync(CancellationToken.None);
         Categories.ItemsSource = apps.Select(CategoryRow).ToList();
     }
 
     private void OnChanged(object sender, RoutedEventArgs e) =>
-        Save(_settings with { Animations = Animations.IsChecked == true, StoreWindowTitles = StoreTitles.IsChecked == true });
+        Save(_settings with
+        {
+            Animations = Animations.IsChecked == true,
+            StoreWindowTitles = StoreTitles.IsChecked == true,
+            CheckForUpdates = CheckForUpdates.IsChecked == true,
+        });
+
+    private async void OnCheckNow(object sender, RoutedEventArgs e)
+    {
+        CheckNow.IsEnabled = false;
+        UpdateStatus.Text = "Checking…";
+        try
+        {
+            ShowUpdate(await _updates.CheckAsync(CancellationToken.None), checkedJustNow: true);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        {
+            UpdateStatus.Text = "Couldn't reach GitHub. Check your connection and try again.";
+        }
+        finally
+        {
+            CheckNow.IsEnabled = true;
+        }
+    }
+
+    private async void OnInstallUpdate(object sender, RoutedEventArgs e)
+    {
+        if (_updates.Available is not { } update)
+            return;
+
+        InstallUpdate.IsEnabled = CheckNow.IsEnabled = false;
+        UpdateStatus.Text = "Downloading the update. Locked In restarts when it's installed.";
+        try
+        {
+            await _updates.InstallAsync(update);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException)
+        {
+            UpdateStatus.Text = "The update couldn't be downloaded. Try again later.";
+            InstallUpdate.IsEnabled = CheckNow.IsEnabled = true;
+        }
+    }
+
+    private void ShowUpdate(AvailableUpdate? update, bool checkedJustNow)
+    {
+        UpdateStatus.Text = update is not null
+            ? $"Version {update.Version.ToString(3)} is available."
+            : checkedJustNow ? "You're on the latest version." : "";
+        InstallUpdate.Content = update is null ? null : $"Update to {update.Version.ToString(3)}";
+        InstallUpdate.Visibility = update is null ? Visibility.Collapsed : Visibility.Visible;
+    }
 
     private void Save(GeneralSettings settings)
     {

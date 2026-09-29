@@ -13,7 +13,8 @@ public sealed record GeneralSettings(
     bool Animations,
     int IdleMinutes,
     bool StoreWindowTitles,
-    int StreakToleranceSeconds)
+    int StreakToleranceSeconds,
+    bool CheckForUpdates)
 {
     public static readonly int[] IdleMinuteChoices = [1, 2, 5, 10, 15];
     public static readonly int[] StreakToleranceChoices = [15, 30, 60, 120, 300];
@@ -24,6 +25,7 @@ public sealed class GeneralSettingsService(IConfiguration configuration, IOption
 {
     private const string TrackerSection = $"{SettingsFile.SectionName}:Tracker";
     private const string MetricsSection = $"{SettingsFile.SectionName}:Metrics";
+    private const string UpdatesSection = $"{SettingsFile.SectionName}:Updates";
 
     public GeneralSettings Get()
     {
@@ -34,7 +36,8 @@ public sealed class GeneralSettingsService(IConfiguration configuration, IOption
             look.Animations,
             (int)configuration.GetValue($"{TrackerSection}:IdleThreshold", TimeSpan.FromMinutes(2)).TotalMinutes,
             configuration.GetValue<bool>($"{TrackerSection}:StoreWindowTitles"),
-            (int)configuration.GetValue($"{MetricsSection}:StreakInterruptionTolerance", TimeSpan.FromSeconds(30)).TotalSeconds);
+            (int)configuration.GetValue($"{MetricsSection}:StreakInterruptionTolerance", TimeSpan.FromSeconds(30)).TotalSeconds,
+            configuration.GetValue($"{UpdatesSection}:CheckAutomatically", true));
     }
 
     public void Save(GeneralSettings settings)
@@ -60,6 +63,10 @@ public sealed class GeneralSettingsService(IConfiguration configuration, IOption
                 ["Metrics"] = new JsonObject
                 {
                     ["StreakInterruptionTolerance"] = TimeSpan.FromSeconds(tolerance).ToString(),
+                },
+                ["Updates"] = new JsonObject
+                {
+                    ["CheckAutomatically"] = settings.CheckForUpdates,
                 },
             },
         };

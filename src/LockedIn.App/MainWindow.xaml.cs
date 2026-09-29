@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Navigation;
 using LockedIn.App.Services;
 using LockedIn.App.Theming;
+using LockedIn.App.Updates;
 using LockedIn.App.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,7 +46,10 @@ public partial class MainWindow : Window
             "ScreenTime" => new ScreenTimePage(_services.GetRequiredService<DashboardService>()),
             "History" => new HistoryPage(_services.GetRequiredService<DashboardService>()),
             "Apps" => new AppsPage(_services.GetRequiredService<DashboardService>()),
-            "Settings" => new SettingsPage(_services.GetRequiredService<GeneralSettingsService>(), _services.GetRequiredService<CategorySettingsService>()),
+            "Settings" => new SettingsPage(
+                _services.GetRequiredService<GeneralSettingsService>(),
+                _services.GetRequiredService<CategorySettingsService>(),
+                _services.GetRequiredService<UpdateService>()),
             _ => new TodayPage(_services.GetRequiredService<DashboardService>()),
         };
 

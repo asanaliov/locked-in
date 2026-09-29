@@ -1,5 +1,6 @@
 using LockedIn.App.Services;
 using LockedIn.App.Tray;
+using LockedIn.App.Updates;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using LockedIn.Tracker;
@@ -32,6 +33,9 @@ internal static class LockedInHost
         builder.Services.AddSingleton<DashboardService>();
         builder.Services.AddSingleton<CategorySettingsService>();
         builder.Services.AddSingleton<GeneralSettingsService>();
+        builder.Services.Configure<UpdateOptions>(builder.Configuration.GetSection(UpdateOptions.SectionName));
+        builder.Services.AddSingleton<UpdateService>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<UpdateService>());
         return builder.Build();
     }
 

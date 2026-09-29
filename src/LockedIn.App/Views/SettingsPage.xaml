@@ -99,6 +99,37 @@
 
         <Border Style="{StaticResource CardPanel}">
             <StackPanel>
+                <TextBlock Text="Updates" Style="{StaticResource CardTitle}" />
+                <Grid Style="{StaticResource Setting}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Check for updates" Style="{StaticResource SettingName}" />
+                        <TextBlock Text="Once a day, asks GitHub whether a newer version is out. Nothing about you or your usage is sent." Style="{StaticResource MutedText}" />
+                    </StackPanel>
+                    <CheckBox x:Name="CheckForUpdates" Grid.Column="1" Style="{StaticResource Switch}" VerticalAlignment="Center" Click="OnChanged" />
+                </Grid>
+                <Grid Style="{StaticResource Setting}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock x:Name="VersionText" Style="{StaticResource SettingName}" />
+                        <TextBlock x:Name="UpdateStatus" Style="{StaticResource MutedText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button x:Name="CheckNow" Content="Check now" Style="{StaticResource Button}" Click="OnCheckNow" />
+                        <Button x:Name="InstallUpdate" Style="{StaticResource AccentButton}" Margin="8,0,0,0" Visibility="Collapsed" Click="OnInstallUpdate" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardPanel}">
+            <StackPanel>
                 <TextBlock Text="App categories" Style="{StaticResource CardTitle}" />
                 <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,12"
                            Text="Changing a category also updates that app's past sessions. Browsers are classified per tab title using the keywords in lockedin.json; their setting only applies when no keyword matches." />

@@ -9,6 +9,9 @@
     "Metrics": {
       "StreakInterruptionTolerance": "00:00:30"
     },
+    "Updates": {
+      "CheckAutomatically": true
+    },
     "Categories": {
       "Browsers": [ "chrome", "msedge", "firefox", "brave", "opera", "vivaldi", "arc" ],
       "Apps": {
