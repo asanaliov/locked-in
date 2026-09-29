@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using LockedIn.Data;
+using Microsoft.Extensions.Options;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
@@ -14,9 +16,9 @@ internal sealed partial class MainWindow : Form
 
     // Match --bg, --text and --border in site.css so the title bar blends into the dashboard header.
     private static readonly (Color Background, Color Text, Color Border) LightTheme =
-        (ColorTranslator.FromHtml("#f3f4fb"), ColorTranslator.FromHtml("#171a33"), ColorTranslator.FromHtml("#e2e4f1"));
+        (ColorTranslator.FromHtml("#f5f5f7"), ColorTranslator.FromHtml("#1d1d1f"), ColorTranslator.FromHtml("#e5e5ea"));
     private static readonly (Color Background, Color Text, Color Border) DarkTheme =
-        (ColorTranslator.FromHtml("#0f1226"), ColorTranslator.FromHtml("#e9eaf5"), ColorTranslator.FromHtml("#272c52"));
+        (ColorTranslator.FromHtml("#000000"), ColorTranslator.FromHtml("#f5f5f7"), ColorTranslator.FromHtml("#1c1c1e"));
 
     private const int DwmwaUseImmersiveDarkMode = 20;
     private const int DwmwaWindowCornerPreference = 33;
@@ -27,12 +29,15 @@ internal sealed partial class MainWindow : Form
 
     private readonly WebView2 _webView = new() { Dock = DockStyle.Fill };
     private readonly Uri _dashboard;
+    private readonly IOptionsMonitor<AppearanceOptions> _appearance;
+    private readonly IDisposable? _appearanceChanged;
 
-    public MainWindow(string dashboardUrl)
+    public MainWindow(string dashboardUrl, IOptionsMonitor<AppearanceOptions> appearance)
     {
         _dashboard = new Uri(dashboardUrl);
+        _appearance = appearance;
 
-        Text = "locked-in";
+        Text = "Locked In";
         Icon = AppIcon.Value;
         Size = new Size(1100, 850);
         MinimumSize = new Size(480, 400);
@@ -41,7 +46,9 @@ internal sealed partial class MainWindow : Form
 
         ApplyTheme();
         SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
+        _appearanceChanged = appearance.OnChange(_ => ApplyThemeFromAnyThread());
         Load += async (_, _) => await ShowDashboardAsync();
+        Resize += async (_, _) => await PauseWhileMinimizedAsync();
     }
 
     protected override void OnHandleCreated(EventArgs e)
@@ -53,13 +60,22 @@ internal sealed partial class MainWindow : Form
     protected override void Dispose(bool disposing)
     {
         if (disposing)
+        {
             SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
+            _appearanceChanged?.Dispose();
+        }
         base.Dispose(disposing);
     }
 
     private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
     {
         if (e.Category == UserPreferenceCategory.General)
+            ApplyThemeFromAnyThread();
+    }
+
+    private void ApplyThemeFromAnyThread()
+    {
+        if (IsHandleCreated && !IsDisposed)
             BeginInvoke(ApplyTheme);
     }
 
@@ -85,7 +101,14 @@ internal sealed partial class MainWindow : Form
     private void SetWindowAttribute(int attribute, int value) =>
         DwmSetWindowAttribute(Handle, attribute, ref value, sizeof(int));
 
-    private static bool IsDarkMode() =>
+    private bool IsDarkMode() => _appearance.CurrentValue.Theme switch
+    {
+        Theme.Light => false,
+        Theme.Dark => true,
+        _ => IsWindowsDarkMode(),
+    };
+
+    private static bool IsWindowsDarkMode() =>
         Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
             "AppsUseLightTheme", 1) is 0;
 
@@ -103,8 +126,8 @@ internal sealed partial class MainWindow : Form
         catch (WebView2RuntimeNotFoundException)
         {
             MessageBox.Show(
-                "locked-in needs the Microsoft Edge WebView2 Runtime. The dashboard will open in your browser instead.",
-                "locked-in", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                "Locked In needs the Microsoft Edge WebView2 Runtime. The dashboard will open in your browser instead.",
+                "Locked In", MessageBoxButtons.OK, MessageBoxIcon.Information);
             OpenInBrowser(_dashboard.ToString());
             Close();
             return;
@@ -125,6 +148,32 @@ internal sealed partial class MainWindow : Form
             OpenInBrowser(e.Uri);
         };
         _webView.Source = _dashboard;
+    }
+
+    /// <summary>
+    /// A minimized dashboard doesn't need a live browser: suspend it so Chromium stops using CPU and trims memory.
+    /// Restoring resumes it and reloads so the numbers are fresh.
+    /// </summary>
+    private async Task PauseWhileMinimizedAsync()
+    {
+        if (_webView.CoreWebView2 is not { } core)
+            return;
+
+        var minimized = WindowState == FormWindowState.Minimized;
+        if (_webView.Visible != minimized)
+            return; // already in the right state
+
+        _webView.Visible = !minimized;
+        if (minimized)
+        {
+            core.MemoryUsageTargetLevel = CoreWebView2MemoryUsageTargetLevel.Low;
+            await core.TrySuspendAsync();
+        }
+        else
+        {
+            core.MemoryUsageTargetLevel = CoreWebView2MemoryUsageTargetLevel.Normal;
+            core.Reload();
+        }
     }
 
     private bool IsDashboard(string url) =>

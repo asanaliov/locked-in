@@ -4,27 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LockedIn.Tracker.Sessions;
 
-/// <summary>Settings page overrides, re-read from the database at most once a minute.</summary>
-public sealed class DbCategoryOverrides(IDbContextFactory<LockedInDbContext> dbFactory, IClock clock) : ICategoryOverrides
+/// <summary>Settings page overrides, read from the database once and again only after they change.</summary>
+public sealed class DbCategoryOverrides(IDbContextFactory<LockedInDbContext> dbFactory) : ICategoryOverrides
 {
-    private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(1);
-
-    private Dictionary<string, Category> _overrides = new(StringComparer.OrdinalIgnoreCase);
-    private DateTime _loadedAt = DateTime.MinValue;
+    private volatile Dictionary<string, Category>? _overrides;
 
     public Category? Find(string appName)
     {
-        if (clock.UtcNow - _loadedAt > RefreshInterval)
-            Reload();
-
-        return _overrides.TryGetValue(appName, out var category) ? category : null;
+        var overrides = _overrides ??= Load();
+        return overrides.TryGetValue(appName, out var category) ? category : null;
     }
 
-    private void Reload()
+    public void Invalidate() => _overrides = null;
+
+    private Dictionary<string, Category> Load()
     {
         using var db = dbFactory.CreateDbContext();
-        _overrides = db.CategoryOverrides.AsNoTracking()
+        return db.CategoryOverrides.AsNoTracking()
             .ToDictionary(o => o.AppName, o => o.Category, StringComparer.OrdinalIgnoreCase);
-        _loadedAt = clock.UtcNow;
     }
 }

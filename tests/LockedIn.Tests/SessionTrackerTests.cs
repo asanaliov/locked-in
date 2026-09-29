@@ -3,7 +3,6 @@ using LockedIn.Data.Classification;
 using LockedIn.Tracker;
 using LockedIn.Tracker.Sessions;
 using LockedIn.Tracker.Windows;
-using Microsoft.Extensions.Options;
 
 namespace LockedIn.Tests;
 
@@ -15,6 +14,7 @@ public sealed class SessionTrackerTests
     private readonly FakeWindows _windows = new();
     private readonly FakeIdleDetector _idle = new();
     private readonly InMemorySessionStore _store = new();
+    private readonly FakeIconCache _icons = new();
     private readonly TrackerOptions _options = new() { IdleThreshold = TimeSpan.FromMinutes(2) };
 
     private SessionTracker CreateTracker()
@@ -25,7 +25,7 @@ public sealed class SessionTrackerTests
             Apps = new(StringComparer.OrdinalIgnoreCase) { ["rider64"] = Category.Focus },
             TitleKeywords = new(StringComparer.OrdinalIgnoreCase) { ["youtube"] = Category.Distraction },
         };
-        return new SessionTracker(_windows, _idle, new AppClassifier(rules, new FakeOverrides()), _clock, _store, Options.Create(_options));
+        return new SessionTracker(_windows, _idle, new AppClassifier(rules, new FakeOverrides()), _clock, _store, _icons, new FixedOptionsMonitor<TrackerOptions>(_options));
     }
 
     private async Task TickAsync(SessionTracker tracker, int times = 1)
@@ -113,6 +113,17 @@ public sealed class SessionTrackerTests
 
         Assert.Equal(2, _store.Saved.Count);
         Assert.Equal(resumedAt, _store.Saved[1].StartTime);
+    }
+
+    [Fact]
+    public async Task New_session_remembers_the_app_icon()
+    {
+        var tracker = CreateTracker();
+        _windows.Current = new ActiveWindow("rider64", "Program.cs", @"C:\Rider\rider64.exe");
+
+        await TickAsync(tracker, times: 3);
+
+        Assert.Equal([("rider64", @"C:\Rider\rider64.exe")], _icons.Remembered);
     }
 
     [Fact]

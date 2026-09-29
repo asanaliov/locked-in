@@ -1,4 +1,6 @@
 using LockedIn.Data;
+using LockedIn.Data.Metrics;
+using Microsoft.Extensions.Options;
 
 namespace LockedIn.App.Tray;
 
@@ -12,6 +14,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
     private readonly string _dashboardUrl;
     private readonly LiveStatusProvider _status;
+    private readonly IOptionsMonitor<AppearanceOptions> _appearance;
     private readonly NotifyIcon _icon;
     private readonly RegisteredWaitHandle _activateWait;
     private MainWindow? _window;
@@ -21,12 +24,13 @@ internal sealed class TrayApplicationContext : ApplicationContext
     {
         _dashboardUrl = dashboardUrl;
         _status = services.GetRequiredService<LiveStatusProvider>();
+        _appearance = services.GetRequiredService<IOptionsMonitor<AppearanceOptions>>();
 
         // Creating the menu installs the WinForms synchronization context captured below.
         var menu = BuildMenu();
         var ui = SynchronizationContext.Current!;
 
-        _icon = new NotifyIcon { Icon = AppIcon.Value, Text = "locked-in", Visible = true, ContextMenuStrip = menu };
+        _icon = new NotifyIcon { Icon = AppIcon.Value, Text = "Locked In", Visible = true, ContextMenuStrip = menu };
         _icon.MouseMove += async (_, _) => await RefreshTooltipAsync();
         _icon.MouseClick += (_, e) =>
         {
@@ -60,7 +64,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         };
 
         var menu = new ContextMenuStrip();
-        menu.Items.Add("Open locked-in", null, (_, _) => ShowWindow());
+        menu.Items.Add("Open Locked In", null, (_, _) => ShowWindow());
         menu.Items.Add(startWithWindows);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitThread());
@@ -70,7 +74,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
     private void ShowWindow()
     {
         if (_window is null || _window.IsDisposed)
-            _window = new MainWindow(_dashboardUrl);
+            _window = new MainWindow(_dashboardUrl, _appearance);
 
         _window.Show();
         if (_window.WindowState == FormWindowState.Minimized)
@@ -88,11 +92,11 @@ internal sealed class TrayApplicationContext : ApplicationContext
         {
             // Off the UI thread so the database call never blocks the message loop.
             var live = await Task.Run(() => _status.GetAsync(CancellationToken.None));
-            _icon.Text = $"locked-in · score {live.Score} · streak {Format.Duration(live.CurrentStreak)}";
+            _icon.Text = $"Locked In · {LockInStages.For(live.Score).Name} ({live.Score}) · streak {Format.Duration(live.CurrentStreak)}";
         }
         catch (Exception)
         {
-            _icon.Text = "locked-in";
+            _icon.Text = "Locked In";
         }
     }
 }

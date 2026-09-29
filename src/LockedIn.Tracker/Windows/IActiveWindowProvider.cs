@@ -1,6 +1,6 @@
 namespace LockedIn.Tracker.Windows;
 
-public sealed record ActiveWindow(string AppName, string Title);
+public sealed record ActiveWindow(string AppName, string Title, string? ExecutablePath = null);
 
 public interface IActiveWindowProvider
 {

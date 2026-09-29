@@ -1,0 +1,116 @@
+@model ScreenTimeViewModel
+@{
+    ViewData["Title"] = "Screen time";
+    var today = Model.Today.Metrics;
+    var average = Model.DailyAverage;
+    var difference = today.ActiveTime - average;
+    var longest = today.Apps.FirstOrDefault()?.Time ?? TimeSpan.Zero;
+}
+
+<h1>Screen time</h1>
+
+<div class="card hero">
+    <div>
+        <div class="screen-total">@Format.Duration(today.ActiveTime)</div>
+        <div class="stat-label">
+            Today
+            @if (average > TimeSpan.Zero && difference.Duration() >= TimeSpan.FromMinutes(1))
+            {
+                <text>· @Format.Duration(difference.Duration()) @(difference > TimeSpan.Zero ? "above" : "below") your daily average</text>
+            }
+        </div>
+    </div>
+
+    <div class="stats">
+        <div>
+            <div class="stat-value">@Format.Duration(average)</div>
+            <div class="stat-label">Daily average, last 7 days</div>
+        </div>
+        <div>
+            <div class="stat-value">@(today.Apps.FirstOrDefault()?.AppName ?? "–")</div>
+            <div class="stat-label">Most used today</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Today by hour</h2>
+    <div style="height: 200px"><canvas id="hours"></canvas></div>
+</div>
+
+<div class="card">
+    <h2>Last 7 days</h2>
+    <div style="height: 240px"><canvas id="week"></canvas></div>
+</div>
+
+<div class="card">
+    <h2>Apps today</h2>
+    @if (today.Apps.Count == 0)
+    {
+        <div class="empty">Nothing tracked yet today. Is the tracker running?</div>
+    }
+    else
+    {
+        <table>
+            <tbody>
+                @foreach (var app in today.Apps)
+                {
+                    <tr>
+                        <td><span class="app-cell"><partial name="_AppIcon" model="(app.AppName, app.Category)" />@app.AppName</span></td>
+                        <td style="width: 55%"><div class="bar screen-bar" style="width: @((app.Time / longest * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div></td>
+                        <td class="num">@Format.Duration(app.Time)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<script>
+    const accent = css.getPropertyValue('--accent').trim();
+    const minutes = v => v >= 60 ? `${Math.floor(v / 60)}h ${String(Math.round(v % 60)).padStart(2, '0')}m` : `${Math.round(v)}m`;
+
+    const hourLabels = Array.from({ length: 24 }, (_, h) => h === 0 ? '12a' : h < 12 ? `${h}a` : h === 12 ? '12p' : `${h - 12}p`);
+    new Chart(document.getElementById('hours'), {
+        type: 'bar',
+        data: {
+            labels: hourLabels,
+            datasets: [{ data: @Json.Serialize(Model.MinutesPerHour.Select(m => Math.Round(m, 1))), backgroundColor: accent, borderRadius: 4 }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { tooltip: { callbacks: { label: ctx => minutes(ctx.raw) } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0, callback: (_, i) => i % 3 === 0 ? hourLabels[i] : '' } },
+                y: { suggestedMax: 60, ticks: { stepSize: 15, callback: v => `${v}m` }, border: { display: false } },
+            },
+        },
+    });
+
+    const week = @Json.Serialize(Model.Week.Select(d => new { label = d.Day.ToString("ddd"), minutes = Math.Round(d.Metrics.ActiveTime.TotalMinutes, 1) }));
+    const average = @Math.Round(average.TotalMinutes, 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    new Chart(document.getElementById('week'), {
+        data: {
+            labels: week.map(d => d.label),
+            datasets: [
+                {
+                    type: 'line', label: 'Daily average', data: week.map(() => average),
+                    borderColor: css.getPropertyValue('--muted').trim(), borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0,
+                },
+                {
+                    type: 'bar', label: 'Screen time', data: week.map(d => d.minutes),
+                    backgroundColor: week.map((_, i) => i === week.length - 1 ? accent : accent + '66'),
+                    borderRadius: 6, barPercentage: 0.6,
+                },
+            ],
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${minutes(ctx.raw)}` } } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { ticks: { callback: v => minutes(v) }, border: { display: false } },
+            },
+        },
+    });
+</script>

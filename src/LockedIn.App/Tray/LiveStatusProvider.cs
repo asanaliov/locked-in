@@ -11,7 +11,7 @@ public sealed record LiveStatus(int Score, TimeSpan CurrentStreak);
 public sealed class LiveStatusProvider(
     IDbContextFactory<LockedInDbContext> dbFactory,
     ICurrentSessionSource currentSession,
-    IOptions<MetricsOptions> options)
+    IOptionsMonitor<MetricsOptions> options)
 {
     public async Task<LiveStatus> GetAsync(CancellationToken cancellationToken)
     {
@@ -21,7 +21,7 @@ public sealed class LiveStatusProvider(
         await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
         var sessions = await db.LoadClippedAsync(dayStart, now, currentSession, cancellationToken);
 
-        var tolerance = options.Value.StreakInterruptionTolerance;
+        var tolerance = options.CurrentValue.StreakInterruptionTolerance;
         var today = DayMetricsCalculator.Calculate(sessions, tolerance);
         return new LiveStatus(today.Score, StreakCalculator.CurrentFocusStreak(sessions, tolerance, now));
     }

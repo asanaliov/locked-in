@@ -2,6 +2,7 @@ using LockedIn.App.Tray;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using LockedIn.Tracker;
+using LockedIn.Tracker.Windows;
 using LockedIn.Web;
 
 namespace LockedIn.App;
@@ -17,9 +18,15 @@ internal static class LockedInHost
         builder.WebHost.UseUrls("http://127.0.0.1:0"); // loopback only, on any free port
         builder.Configuration.AddLockedInSettings();
 
+        // No console in a tray app; only warnings and errors go to the Windows event log.
+        builder.Logging.ClearProviders();
+        builder.Logging.AddEventLog();
+
         builder.Services.Configure<MetricsOptions>(builder.Configuration.GetSection(MetricsOptions.SectionName));
+        builder.Services.Configure<AppearanceOptions>(builder.Configuration.GetSection(AppearanceOptions.SectionName));
         builder.Services.AddLockedInDatabase(builder.Configuration);
         builder.Services.AddLockedInTracker(builder.Configuration);
+        builder.Services.AddSingleton<IAppIconCache, AppIconCache>();
         builder.Services.AddLockedInDashboard();
         builder.Services.AddSingleton<LiveStatusProvider>();
 

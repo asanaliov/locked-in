@@ -1,7 +1,7 @@
 namespace LockedIn.App;
 
 /// <summary>
-/// Only one locked-in may run, or every second would be recorded twice.
+/// Only one Locked In may run, or every second would be recorded twice.
 /// Starting it again just brings the running one's window to the front.
 /// </summary>
 internal sealed class SingleInstance : IDisposable

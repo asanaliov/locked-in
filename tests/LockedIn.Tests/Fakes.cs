@@ -3,6 +3,7 @@ using LockedIn.Data.Classification;
 using LockedIn.Tracker;
 using LockedIn.Tracker.Sessions;
 using LockedIn.Tracker.Windows;
+using Microsoft.Extensions.Options;
 
 namespace LockedIn.Tests;
 
@@ -32,6 +33,15 @@ internal sealed class FakeOverrides : ICategoryOverrides
     public Dictionary<string, Category> Overrides { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public Category? Find(string appName) => Overrides.TryGetValue(appName, out var category) ? category : null;
+
+    public void Invalidate() { }
+}
+
+internal sealed class FakeIconCache : IAppIconCache
+{
+    public List<(string AppName, string Path)> Remembered { get; } = [];
+
+    public void Remember(string appName, string executablePath) => Remembered.Add((appName, executablePath));
 }
 
 internal sealed class InMemorySessionStore : ISessionStore
@@ -43,6 +53,16 @@ internal sealed class InMemorySessionStore : ISessionStore
         Saved.Add(session);
         return Task.CompletedTask;
     }
+}
+
+/// <summary>Always returns the same instance, so a test can change it after handing it over.</summary>
+internal sealed class FixedOptionsMonitor<T>(T value) : IOptionsMonitor<T>
+{
+    public T CurrentValue => value;
+
+    public T Get(string? name) => value;
+
+    public IDisposable? OnChange(Action<T, string?> listener) => null;
 }
 
 internal static class Sessions

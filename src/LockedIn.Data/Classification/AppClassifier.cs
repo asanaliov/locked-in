@@ -8,6 +8,9 @@ public interface IAppClassifier
 public interface ICategoryOverrides
 {
     Category? Find(string appName);
+
+    /// <summary>Call after the overrides change so the next lookup sees them.</summary>
+    void Invalidate();
 }
 
 /// <summary>

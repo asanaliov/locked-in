@@ -1,0 +1,9 @@
+@model (string AppName, Category Category)
+@if (AppIconFiles.Exists(Model.AppName))
+{
+    <img class="app-icon" src="@Url.Action("Get", "Icons", new { app = Model.AppName })" alt="" />
+}
+else
+{
+    <div class="app-icon @Model.Category" aria-hidden="true">@Model.AppName[..1].ToUpperInvariant()</div>
+}

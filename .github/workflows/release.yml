@@ -46,5 +46,5 @@ jobs:
           if ($LASTEXITCODE -eq 0) {
             gh release upload $tag $installer.FullName --clobber
           } else {
-            gh release create $tag $installer.FullName --title "locked-in $tag" --generate-notes
+            gh release create $tag $installer.FullName --title "Locked In $tag" --generate-notes
           }

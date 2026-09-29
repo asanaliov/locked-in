@@ -37,7 +37,7 @@ public sealed class AppClassifierTests
 
     [Theory]
     [InlineData("Funny cats - YouTube - Google Chrome", Category.Distraction)]
-    [InlineData("locked-in · GitHub - Google Chrome", Category.Focus)]
+    [InlineData("Locked In · GitHub - Google Chrome", Category.Focus)]
     [InlineData("New Tab - Google Chrome", Category.Neutral)]
     public void Classifies_browsers_by_title_keyword(string title, Category expected) =>
         Assert.Equal(expected, _classifier.Classify("chrome", title));

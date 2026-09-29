@@ -1,17 +1,23 @@
+@inject Microsoft.Extensions.Options.IOptionsMonitor<AppearanceOptions> AppearanceMonitor
 @{
+    var appearance = AppearanceMonitor.CurrentValue;
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     string? Active(string name) => controller == name ? "active" : null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      data-theme="@(appearance.Theme == Theme.System ? null : appearance.Theme.ToString().ToLowerInvariant())"
+      data-accent="@(appearance.Accent == Accent.Blue ? null : appearance.Accent.ToString().ToLowerInvariant())"
+      data-motion="@(appearance.Animations ? null : "off")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] · locked-in</title>
+    <title>@ViewData["Title"] · Locked In</title>
     <link rel="stylesheet" href="~/_content/LockedIn.Web/css/site.css" asp-append-version="true" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script>
         const css = getComputedStyle(document.documentElement);
+        const reduceMotion = document.documentElement.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches;
         const categoryColors = {
             Focus: css.getPropertyValue('--focus').trim(),
             Neutral: css.getPropertyValue('--neutral').trim(),
@@ -24,7 +30,7 @@
         Chart.defaults.plugins.legend.labels.usePointStyle = true;
         Chart.defaults.plugins.tooltip.padding = 10;
         Chart.defaults.plugins.tooltip.cornerRadius = 8;
-        Chart.defaults.animation.duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900;
+        Chart.defaults.animation.duration = reduceMotion ? 0 : 900;
         Chart.defaults.animation.easing = 'easeOutQuart';
     </script>
 </head>
@@ -36,12 +42,15 @@
                     <path d="M21 30V21a11 11 0 0 1 22 0v9" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" />
                     <path d="M21 28h22a9 9 0 0 1 9 9v12a9 9 0 0 1-9 9H21a9 9 0 0 1-9-9V37a9 9 0 0 1 9-9ZM32 35a4 4 0 1 0 0 8a4 4 0 1 0 0-8ZM29.5 47.5v2a2.5 2.5 0 0 0 5 0v-2a2.5 2.5 0 0 0-5 0Z" fill-rule="evenodd" />
                 </svg>
-                locked-in
+                Locked In
             </a>
-            <a class="@Active("Today")" asp-controller="Today" asp-action="Index">Today</a>
-            <a class="@Active("History")" asp-controller="History" asp-action="Index">Last 7 days</a>
-            <a class="@Active("Apps")" asp-controller="Apps" asp-action="Index">Top apps</a>
-            <a class="@Active("Settings")" asp-controller="Settings" asp-action="Index">Settings</a>
+            <div class="nav-links">
+                <a class="@Active("Today")" asp-controller="Today" asp-action="Index">Today</a>
+                <a class="@Active("ScreenTime")" asp-controller="ScreenTime" asp-action="Index">Screen time</a>
+                <a class="@Active("History")" asp-controller="History" asp-action="Index">Last 7 days</a>
+                <a class="@Active("Apps")" asp-controller="Apps" asp-action="Index">Top apps</a>
+                <a class="@Active("Settings")" asp-controller="Settings" asp-action="Index">Settings</a>
+            </div>
         </nav>
     </header>
     <main>
@@ -49,7 +58,7 @@
     </main>
     <footer>
         <p>All data stays on this machine.</p>
-        <p>locked-in v@(typeof(DashboardSetup).Assembly.GetName().Version?.ToString(3)) · made by <a href="https://github.com/asanaliov">Asan</a> · <a href="https://github.com/asanaliov/locked-in">source</a></p>
+        <p>Locked In v@(typeof(DashboardSetup).Assembly.GetName().Version?.ToString(3)) · made by <a href="https://github.com/asanaliov">Asan</a> · <a href="https://github.com/asanaliov/locked-in">source</a></p>
     </footer>
 </body>
 </html>
