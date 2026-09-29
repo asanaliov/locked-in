@@ -1,6 +1,9 @@
+using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using LockedIn.Data;
 using LockedIn.Tracker.Windows;
+using Microsoft.Extensions.Logging;
 
 namespace LockedIn.App;
 

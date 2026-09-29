@@ -1,0 +1,95 @@
+<UserControl x:Class="LockedIn.App.Views.HistoryPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:LockedIn.App.Controls">
+    <UserControl.Resources>
+        <Style x:Key="Num" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="Head" TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <TextBlock Text="Last 7 days" Style="{StaticResource PageTitle}" />
+
+        <Border Style="{StaticResource CardPanel}">
+            <StackPanel>
+                <TextBlock Text="Active hours and Locked In Score" Style="{StaticResource CardTitle}" />
+                <c:ColumnChart x:Name="WeekChart" Height="280" />
+                <ItemsControl ItemsSource="{Binding Legend}" Margin="44,10,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,18,0">
+                                <Ellipse Width="8" Height="8" Fill="{Binding Brush}" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardPanel}">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*" />
+                        <ColumnDefinition Width="0.6*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Day" Style="{StaticResource Head}" />
+                    <TextBlock Grid.Column="1" Text="Score" Style="{StaticResource Head}" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="2" Text="Stage" Style="{StaticResource Head}" Margin="16,0,0,0" />
+                    <TextBlock Grid.Column="3" Text="Active" Style="{StaticResource Head}" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="4" Text="Focus" Style="{StaticResource Head}" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="5" Text="Distracted" Style="{StaticResource Head}" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="6" Text="Streak" Style="{StaticResource Head}" HorizontalAlignment="Right" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Days}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.3*" />
+                                        <ColumnDefinition Width="0.6*" />
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Day}" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Score}" FontWeight="Bold" Style="{StaticResource Num}" />
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="16,0,0,0">
+                                        <Border CornerRadius="5" ClipToBounds="True" Width="36" Height="25" Margin="0,0,8,0">
+                                            <Image Source="{Binding StageImage}" Stretch="UniformToFill" />
+                                        </Border>
+                                        <TextBlock Text="{Binding Stage}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="3" Text="{Binding Active}" Style="{StaticResource Num}" />
+                                    <TextBlock Grid.Column="4" Text="{Binding Focus}" Style="{StaticResource Num}" />
+                                    <TextBlock Grid.Column="5" Text="{Binding Distraction}" Style="{StaticResource Num}" />
+                                    <TextBlock Grid.Column="6" Text="{Binding Streak}" Style="{StaticResource Num}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

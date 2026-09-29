@@ -1,0 +1,110 @@
+<UserControl x:Class="LockedIn.App.Views.TodayPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:LockedIn.App.Controls">
+    <StackPanel>
+        <TextBlock Text="{Binding Date}" Style="{StaticResource MutedText}" FontSize="14" />
+        <TextBlock Text="Today" Style="{StaticResource PageTitle}" />
+
+        <Border Style="{StaticResource CardPanel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid Width="180" Height="180" Margin="4,4,36,4">
+                    <c:ScoreRing x:Name="Ring" />
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding Value, ElementName=Ring, StringFormat={}{0:0}}" FontFamily="{StaticResource DisplayFont}"
+                                   FontSize="52" FontWeight="Bold" HorizontalAlignment="Center" />
+                        <TextBlock Text="Locked In Score" Style="{StaticResource MutedText}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+                <UniformGrid Grid.Column="1" Columns="2" VerticalAlignment="Center">
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding ActiveTime}" Style="{StaticResource StatValue}" />
+                        <TextBlock Text="Active time" Style="{StaticResource MutedText}" />
+                    </StackPanel>
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding FocusRatio}" Style="{StaticResource StatValue}" />
+                        <TextBlock Text="Focus ratio" Style="{StaticResource MutedText}" />
+                    </StackPanel>
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding LongestStreak}" Style="{StaticResource StatValue}" />
+                        <TextBlock Text="Longest streak" Style="{StaticResource MutedText}" />
+                    </StackPanel>
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding SwitchesPerHour}" Style="{StaticResource StatValue}" />
+                        <TextBlock Text="Switches / hour" Style="{StaticResource MutedText}" />
+                    </StackPanel>
+                </UniformGrid>
+            </Grid>
+        </Border>
+
+        <Border Style="{StaticResource CardPanel}" Padding="32" Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}">
+            <StackPanel HorizontalAlignment="Center">
+                <Image Source="{Binding EmptyImage}" Width="320" Margin="0,0,0,20" />
+                <TextBlock Text="Nothing tracked yet today" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" />
+                <TextBlock Text="Pondering where to start? Open an app and get going. Your day shows up here as you work."
+                           Style="{StaticResource MutedText}" TextAlignment="Center" MaxWidth="340" Margin="0,4,0,0" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel Visibility="{Binding HasData, Converter={StaticResource Visible}}">
+            <Border Style="{StaticResource CardPanel}">
+                <StackPanel>
+                    <TextBlock Text="Stage of locked in" Style="{StaticResource CardTitle}" />
+                    <TextBlock Text="{Binding StageName}" FontFamily="{StaticResource DisplayFont}" FontSize="24" FontWeight="Bold" Margin="0,-4,0,14" />
+                    <ItemsControl ItemsSource="{Binding Stages}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,10,0" Opacity="{Binding Opacity}">
+                                    <Border CornerRadius="12" BorderThickness="2" BorderBrush="{Binding Outline}" ClipToBounds="True">
+                                        <Image Source="{Binding Image}" Stretch="UniformToFill" />
+                                    </Border>
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,8,0,0" />
+                                    <TextBlock Text="{Binding Range}" Style="{StaticResource MutedText}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardPanel}">
+                <StackPanel>
+                    <TextBlock Text="Breakdown" Style="{StaticResource CardTitle}" />
+                    <c:SegmentBar Height="12" Segments="{Binding Breakdown}" />
+                    <ItemsControl ItemsSource="{Binding Legend}" Margin="0,12,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,22,0">
+                                    <Ellipse Width="8" Height="8" Fill="{Binding Brush}" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Name}" Margin="0,0,5,0" />
+                                    <TextBlock Text="{Binding Time}" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardPanel}">
+                <StackPanel>
+                    <TextBlock Text="Time per app" Style="{StaticResource CardTitle}" />
+                    <ItemsControl ItemsSource="{Binding Apps}" ItemTemplate="{StaticResource AppRow}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

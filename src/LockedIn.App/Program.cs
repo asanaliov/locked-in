@@ -1,4 +1,8 @@
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 using LockedIn.App.Tray;
+using Microsoft.Extensions.Hosting;
 
 namespace LockedIn.App;
 
@@ -14,28 +18,31 @@ internal static class Program
             return;
         }
 
-        ApplicationConfiguration.Initialize();
-
-        WebApplication host;
+        IHost host;
         try
         {
             host = LockedInHost.Build();
-            // Task.Run keeps the host's async startup off the UI thread's synchronization context.
+            // Task.Run keeps the host's async startup off the UI thread.
             Task.Run(() => LockedInHost.StartAsync(host)).GetAwaiter().GetResult();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Locked In could not start:\n\n{ex.Message}", "Locked In", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Locked In could not start:\n\n{ex.Message}", "Locked In", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
+        // The window is a static dashboard: software rendering skips loading the GPU driver, which saves a lot of memory.
+        RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+        var app = new App();
+        app.InitializeComponent();
         var startInTray = args.Contains(StartupRegistration.StartInTrayArgument);
-        using (var tray = new TrayApplicationContext(host.Services, host.Urls.First(), instance, showWindow: !startInTray))
+        using (new TrayIcon(host.Services, instance, showWindow: !startInTray))
         {
-            Application.Run(tray);
+            app.Run();
         }
 
         // Stopping the host saves the session in progress.
         Task.Run(() => host.StopAsync()).GetAwaiter().GetResult();
+        host.Dispose();
     }
 }

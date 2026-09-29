@@ -1,0 +1,41 @@
+<Window x:Class="LockedIn.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Locked In" Width="1020" Height="860" MinWidth="600" MinHeight="460"
+        WindowStartupLocation="CenterScreen" Icon="lockedin.ico"
+        Background="{DynamicResource Bg}" Foreground="{DynamicResource Text}"
+        FontFamily="{StaticResource UiFont}" FontSize="14"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1" Padding="20,10">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Path Width="18" Height="18" Stretch="Uniform" Fill="{DynamicResource Accent}" Margin="0,0,8,0"
+                          Data="M21 30V21a11 11 0 0 1 22 0v9h-6.5v-9a4.5 4.5 0 0 0-9 0v9ZM21 28h22a9 9 0 0 1 9 9v12a9 9 0 0 1-9 9H21a9 9 0 0 1-9-9V37a9 9 0 0 1 9-9Z" />
+                    <TextBlock Text="Locked In" FontWeight="Bold" FontSize="15" />
+                </StackPanel>
+                <StackPanel x:Name="Nav" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <RadioButton Content="Today" Tag="Today" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
+                    <RadioButton Content="Screen time" Tag="ScreenTime" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
+                    <RadioButton Content="Last 7 days" Tag="History" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
+                    <RadioButton Content="Top apps" Tag="Apps" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
+                    <RadioButton Content="Settings" Tag="Settings" GroupName="Nav" Style="{StaticResource NavPill}" Checked="OnNavigate" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <StackPanel MaxWidth="960" Margin="24,24,24,16">
+                <ContentControl x:Name="Page" Focusable="False" />
+                <TextBlock Style="{StaticResource MutedText}" FontSize="12" Margin="2,10,0,0">
+                    <Run Text="All data stays on this machine. ·" />
+                    <Run x:Name="Version" />
+                    <Run Text="· made by" />
+                    <Hyperlink NavigateUri="https://github.com/asanaliov" RequestNavigate="OnLink" Foreground="{DynamicResource Muted}">Asan</Hyperlink>
+                    <Run Text="·" />
+                    <Hyperlink NavigateUri="https://github.com/asanaliov/locked-in" RequestNavigate="OnLink" Foreground="{DynamicResource Muted}">source</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

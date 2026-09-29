@@ -9,8 +9,8 @@ public static class LockInStages
     [
         new(1, "Brain idle", 0),
         new(2, "Warming up", 25),
-        new(3, "Locked in", 50),
-        new(4, "Galaxy brain", 75),
+        new(3, "In the zone", 50),
+        new(4, "Locked in", 75),
     ];
 
     public static LockInStage For(int score) => All.LastOrDefault(stage => score >= stage.MinScore) ?? All[0];
