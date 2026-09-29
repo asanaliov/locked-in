@@ -3,7 +3,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Authors>Asan</Authors>
     <Copyright>Copyright (c) 2026 Asan</Copyright>
     <RepositoryUrl>https://github.com/asanaliov/locked-in</RepositoryUrl>
