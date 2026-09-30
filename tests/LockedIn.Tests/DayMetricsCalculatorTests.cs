@@ -45,4 +45,20 @@ public sealed class DayMetricsCalculatorTests
 
         Assert.Equal(0, DayMetricsCalculator.CountContextSwitches(sessions));
     }
+
+    [Fact]
+    public void App_used_in_more_than_one_category_keeps_its_split()
+    {
+        var metrics = DayMetricsCalculator.Calculate(
+        [
+            At(0, 20, Distraction, "chrome"),
+            At(20, 30, Focus, "chrome"),
+        ], Tolerance);
+
+        var chrome = Assert.Single(metrics.Apps);
+        Assert.Equal(Distraction, chrome.Category);
+        Assert.Equal(
+            [new CategoryTime(Focus, TimeSpan.FromMinutes(10)), new CategoryTime(Distraction, TimeSpan.FromMinutes(20))],
+            chrome.Split);
+    }
 }

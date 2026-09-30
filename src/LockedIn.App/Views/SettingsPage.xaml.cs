@@ -135,7 +135,9 @@ public partial class SettingsPage : UserControl, IPage
         name.Children.Add(new TextBlock { Text = app.AppName, FontWeight = FontWeights.Medium, TextTrimming = TextTrimming.CharacterEllipsis });
         name.Children.Add(new TextBlock
         {
-            Text = app.IsBrowser ? $"Browser · default {app.DefaultCategory}" : $"Default {app.DefaultCategory}",
+            Text = app.IsBrowser
+                ? $"Browser. Tabs matching a keyword keep their own category; this sets the rest (default {app.DefaultCategory})."
+                : $"Default {app.DefaultCategory}",
             Style = (Style)FindResource("MutedText"),
             FontSize = 12,
         });

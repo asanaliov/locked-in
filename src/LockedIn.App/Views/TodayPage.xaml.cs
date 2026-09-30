@@ -78,6 +78,6 @@ public partial class TodayPage : UserControl, IPage
                 : [],
             parts.Select(p => new BarSegment(p.Time.TotalMinutes, ThemeManager.For(p.Category))).ToList(),
             parts.Select(p => new LegendItem(p.Category.ToString(), Format.Duration(p.Time), ThemeManager.For(p.Category))).ToList(),
-            AppRow.From(metrics.Apps.Take(15).ToList(), metrics.ActiveTime, app => ThemeManager.For(app.Category)));
+            AppRow.From(metrics.Apps.Take(15).ToList(), metrics.ActiveTime));
     }
 }
