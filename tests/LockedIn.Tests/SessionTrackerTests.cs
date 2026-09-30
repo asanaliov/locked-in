@@ -15,6 +15,7 @@ public sealed class SessionTrackerTests
     private readonly FakeIdleDetector _idle = new();
     private readonly InMemorySessionStore _store = new();
     private readonly FakeIconCache _icons = new();
+    private readonly FakeOverrides _overrides = new();
     private readonly TrackerOptions _options = new() { IdleThreshold = TimeSpan.FromMinutes(2) };
 
     private SessionTracker CreateTracker()
@@ -25,7 +26,7 @@ public sealed class SessionTrackerTests
             Apps = new(StringComparer.OrdinalIgnoreCase) { ["rider64"] = Category.Focus },
             TitleKeywords = new(StringComparer.OrdinalIgnoreCase) { ["youtube"] = Category.Distraction },
         };
-        return new SessionTracker(_windows, _idle, new AppClassifier(rules, new FakeOverrides()), _clock, _store, _icons, new FixedOptionsMonitor<TrackerOptions>(_options));
+        return new SessionTracker(_windows, _idle, new AppClassifier(rules, _overrides), _clock, _store, _icons, new FixedOptionsMonitor<TrackerOptions>(_options));
     }
 
     private async Task TickAsync(SessionTracker tracker, int times = 1)
@@ -166,5 +167,35 @@ public sealed class SessionTrackerTests
         await tracker.FlushAsync(CancellationToken.None);
 
         Assert.Equal(expectedTitle, Assert.Single(_store.Saved).WindowTitle);
+    }
+
+    [Fact]
+    public async Task Session_remembers_whether_a_title_keyword_set_its_category()
+    {
+        var tracker = CreateTracker();
+        _windows.Current = new ActiveWindow("chrome", "Funny cats - YouTube");
+        await TickAsync(tracker);
+        _windows.Current = new ActiveWindow("chrome", "New Tab");
+        await TickAsync(tracker);
+        await tracker.FlushAsync(CancellationToken.None);
+
+        Assert.True(_store.Saved[0].CategoryFromTitle);
+        Assert.False(_store.Saved[1].CategoryFromTitle);
+    }
+
+    [Fact]
+    public async Task Same_category_from_a_different_source_starts_a_new_session()
+    {
+        _overrides.Overrides["chrome"] = Category.Distraction;
+        var tracker = CreateTracker();
+        _windows.Current = new ActiveWindow("chrome", "Funny cats - YouTube");
+        await TickAsync(tracker, times: 2);
+
+        _windows.Current = new ActiveWindow("chrome", "New Tab");
+        await TickAsync(tracker);
+
+        var saved = Assert.Single(_store.Saved);
+        Assert.Equal(Category.Distraction, saved.Category);
+        Assert.True(saved.CategoryFromTitle);
     }
 }

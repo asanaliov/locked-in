@@ -46,7 +46,7 @@ public partial class ScreenTimePage : UserControl, IPage
                 : "Today",
             Format.Duration(average),
             today.Apps.FirstOrDefault()?.AppName ?? "–",
-            AppRow.From(today.Apps, today.ActiveTime, _ => accent));
+            AppRow.From(today.Apps, today.ActiveTime, accent));
 
         HoursChart.SetData(
             hours.Select((minutes, hour) => new ChartColumn(HourLabel(hour), [new BarSegment(minutes, accent)], $"{HourRange(hour)} · {Exact(minutes)}")).ToList(),

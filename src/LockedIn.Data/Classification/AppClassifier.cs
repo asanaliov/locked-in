@@ -1,8 +1,11 @@
 namespace LockedIn.Data.Classification;
 
+/// <param name="ByTitle">True when a browser tab's title keyword decided the category, not the app's own setting.</param>
+public readonly record struct Classification(Category Category, bool ByTitle);
+
 public interface IAppClassifier
 {
-    Category Classify(string appName, string windowTitle);
+    Classification Classify(string appName, string windowTitle);
 }
 
 public interface ICategoryOverrides
@@ -19,12 +22,12 @@ public interface ICategoryOverrides
 /// </summary>
 public sealed class AppClassifier(CategoryRules rules, ICategoryOverrides overrides) : IAppClassifier
 {
-    public Category Classify(string appName, string windowTitle)
+    public Classification Classify(string appName, string windowTitle)
     {
         if (rules.Browsers.Contains(appName) && MatchTitleKeyword(windowTitle) is { } fromTitle)
-            return fromTitle;
+            return new Classification(fromTitle, ByTitle: true);
 
-        return overrides.Find(appName) ?? rules.DefaultFor(appName);
+        return new Classification(overrides.Find(appName) ?? rules.DefaultFor(appName), ByTitle: false);
     }
 
     private Category? MatchTitleKeyword(string windowTitle)

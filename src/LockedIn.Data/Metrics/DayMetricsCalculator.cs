@@ -28,16 +28,22 @@ public static class DayMetricsCalculator
     public static int CountContextSwitches(IReadOnlyList<UsageSession> ordered) =>
         ordered.Zip(ordered.Skip(1)).Count(pair => pair.First.AppName != pair.Second.AppName);
 
+    private static readonly Category[] SplitOrder = [Category.Focus, Category.Neutral, Category.Distraction];
+
     private static IReadOnlyList<AppUsage> TimePerApp(IEnumerable<UsageSession> sessions) =>
         sessions
             .GroupBy(s => s.AppName)
-            .Select(g => new AppUsage(g.Key, DominantCategory(g), Sum(g)))
+            .Select(g =>
+            {
+                // A browser can be both Focus and Distraction, so keep the split as well as the main category.
+                var split = SplitOrder
+                    .Select(category => new CategoryTime(category, Sum(g.Where(s => s.Category == category))))
+                    .Where(part => part.Time > TimeSpan.Zero)
+                    .ToList();
+                return new AppUsage(g.Key, split.MaxBy(part => part.Time).Category, Sum(g), split);
+            })
             .OrderByDescending(a => a.Time)
             .ToList();
-
-    /// <summary>A browser can be both Focus and Distraction; show it as whatever it was most of the time.</summary>
-    private static Category DominantCategory(IEnumerable<UsageSession> sessions) =>
-        sessions.GroupBy(s => s.Category).MaxBy(g => Sum(g))!.Key;
 
     private static TimeSpan Sum(IEnumerable<UsageSession> sessions) =>
         sessions.Aggregate(TimeSpan.Zero, (total, s) => total + s.Duration);

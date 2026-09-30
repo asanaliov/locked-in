@@ -44,8 +44,8 @@ public sealed class SessionTracker(
             return;
         }
 
-        var category = classifier.Classify(window.AppName, window.Title);
-        if (_current?.AppName == window.AppName && _current.Category == category)
+        var (category, byTitle) = classifier.Classify(window.AppName, window.Title);
+        if (_current?.AppName == window.AppName && _current.Category == category && _current.CategoryFromTitle == byTitle)
             return;
 
         await CloseCurrentAsync(now, cancellationToken);
@@ -56,6 +56,7 @@ public sealed class SessionTracker(
         {
             AppName = window.AppName,
             Category = category,
+            CategoryFromTitle = byTitle,
             WindowTitle = options.CurrentValue.StoreWindowTitles ? window.Title : null,
             StartTime = now,
         };
@@ -71,6 +72,7 @@ public sealed class SessionTracker(
         {
             AppName = session.AppName,
             Category = session.Category,
+            CategoryFromTitle = session.CategoryFromTitle,
             StartTime = session.StartTime,
             EndTime = clock.UtcNow,
         };

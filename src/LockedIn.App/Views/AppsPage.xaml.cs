@@ -20,7 +20,7 @@ public partial class AppsPage : UserControl, IPage
     {
         var today = DashboardService.Today;
         var metrics = await _dashboard.GetRangeAsync(today.AddDays(1 - _days), today, CancellationToken.None);
-        List.ItemsSource = AppRow.From(metrics.Apps, metrics.ActiveTime, app => ThemeManager.For(app.Category), withCategoryAndShare: true);
+        List.ItemsSource = AppRow.From(metrics.Apps, metrics.ActiveTime, withCategoryAndShare: true);
         Empty.Visibility = metrics.Apps.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 

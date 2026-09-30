@@ -33,25 +33,25 @@ public sealed class AppClassifierTests
     [InlineData("Discord", Category.Distraction)]
     [InlineData("SomethingNew", Category.Neutral)]
     public void Classifies_by_process_name(string appName, Category expected) =>
-        Assert.Equal(expected, _classifier.Classify(appName, "any title"));
+        Assert.Equal(expected, _classifier.Classify(appName, "any title").Category);
 
     [Theory]
     [InlineData("Funny cats - YouTube - Google Chrome", Category.Distraction)]
     [InlineData("Locked In · GitHub - Google Chrome", Category.Focus)]
     [InlineData("New Tab - Google Chrome", Category.Neutral)]
     public void Classifies_browsers_by_title_keyword(string title, Category expected) =>
-        Assert.Equal(expected, _classifier.Classify("chrome", title));
+        Assert.Equal(expected, _classifier.Classify("chrome", title).Category);
 
     [Fact]
     public void Title_keywords_are_ignored_for_non_browsers() =>
-        Assert.Equal(Category.Distraction, _classifier.Classify("Discord", "github notifications"));
+        Assert.Equal(Category.Distraction, _classifier.Classify("Discord", "github notifications").Category);
 
     [Fact]
     public void Override_wins_over_app_rule()
     {
         _overrides.Overrides["Discord"] = Category.Focus;
 
-        Assert.Equal(Category.Focus, _classifier.Classify("Discord", "team chat"));
+        Assert.Equal(Category.Focus, _classifier.Classify("Discord", "team chat").Category);
     }
 
     [Fact]
@@ -59,7 +59,17 @@ public sealed class AppClassifierTests
     {
         _overrides.Overrides["chrome"] = Category.Focus;
 
-        Assert.Equal(Category.Distraction, _classifier.Classify("chrome", "YouTube"));
-        Assert.Equal(Category.Focus, _classifier.Classify("chrome", "New Tab"));
+        Assert.Equal(Category.Distraction, _classifier.Classify("chrome", "YouTube").Category);
+        Assert.Equal(Category.Focus, _classifier.Classify("chrome", "New Tab").Category);
+    }
+
+    [Fact]
+    public void Reports_when_a_title_keyword_decided()
+    {
+        _overrides.Overrides["chrome"] = Category.Focus;
+
+        Assert.True(_classifier.Classify("chrome", "YouTube").ByTitle);
+        Assert.False(_classifier.Classify("chrome", "New Tab").ByTitle);
+        Assert.False(_classifier.Classify("rider64", "YouTube").ByTitle);
     }
 }

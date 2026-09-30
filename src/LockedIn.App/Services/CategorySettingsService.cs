@@ -35,7 +35,7 @@ public sealed class CategorySettingsService(
 
     /// <summary>
     /// Saves the override (null resets to the default) and re-categorizes the app's past sessions.
-    /// Browser history is left alone because it was classified per tab title.
+    /// Browser tabs whose title keyword set their category keep it, just like new ones will.
     /// </summary>
     public async Task SetCategoryAsync(string appName, Category? category, CancellationToken cancellationToken)
     {
@@ -57,12 +57,9 @@ public sealed class CategorySettingsService(
         await db.SaveChangesAsync(cancellationToken);
         overrides.Invalidate();
 
-        if (!rules.Browsers.Contains(appName))
-        {
-            var effective = category ?? rules.DefaultFor(appName);
-            await db.UsageSessions
-                .Where(s => s.AppName == appName)
-                .ExecuteUpdateAsync(set => set.SetProperty(s => s.Category, effective), cancellationToken);
-        }
+        var effective = category ?? rules.DefaultFor(appName);
+        await db.UsageSessions
+            .Where(s => s.AppName == appName && !s.CategoryFromTitle)
+            .ExecuteUpdateAsync(set => set.SetProperty(s => s.Category, effective), cancellationToken);
     }
 }
