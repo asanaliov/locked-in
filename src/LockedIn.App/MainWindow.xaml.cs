@@ -9,6 +9,7 @@ using LockedIn.App.Theming;
 using LockedIn.App.Updates;
 using LockedIn.App.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Forms = System.Windows.Forms;
 
 namespace LockedIn.App;
 
@@ -18,6 +19,9 @@ namespace LockedIn.App;
 /// </summary>
 public partial class MainWindow : Window
 {
+    /// <summary>Space kept between the window and the screen edges when the screen is smaller than the window.</summary>
+    private const double ScreenMargin = 16;
+
     private readonly IServiceProvider _services;
     private string _current = "Today";
 
@@ -29,7 +33,11 @@ public partial class MainWindow : Window
 
         ThemeManager.Changed += OnThemeChanged;
         Closed += (_, _) => ThemeManager.Changed -= OnThemeChanged;
-        SourceInitialized += (_, _) => ApplyTitleBar();
+        SourceInitialized += (_, _) =>
+        {
+            FitToScreen();
+            ApplyTitleBar();
+        };
         ((RadioButton)Nav.Children[0]).IsChecked = true;
     }
 
@@ -65,6 +73,26 @@ public partial class MainWindow : Window
         ApplyTitleBar();
         if (_current != "Settings")
             await ShowPageAsync();
+    }
+
+    /// <summary>
+    /// Shrinks the window to fit the screen it opens on and centres it above the taskbar. Centring alone would
+    /// push the title bar off the top of a screen with less usable height than the window, as on a laptop at 200%.
+    /// </summary>
+    private void FitToScreen()
+    {
+        if (PresentationSource.FromVisual(this)?.CompositionTarget is not { } target)
+            return;
+
+        // The screen under the pointer, which is the one with the tray icon or the Start menu that opened us.
+        var pixels = Forms.Screen.FromPoint(Forms.Cursor.Position).WorkingArea;
+        var toUnits = target.TransformFromDevice;
+        var area = new Rect(toUnits.Transform(new Point(pixels.Left, pixels.Top)), toUnits.Transform(new Point(pixels.Right, pixels.Bottom)));
+
+        Width = Math.Min(Width, area.Width - 2 * ScreenMargin);
+        Height = Math.Min(Height, area.Height - 2 * ScreenMargin);
+        Left = area.Left + (area.Width - Width) / 2;
+        Top = area.Top + (area.Height - Height) / 2;
     }
 
     /// <summary>Colours the title bar like the page (Windows 11; Windows 10 just gets a light or dark bar).</summary>
