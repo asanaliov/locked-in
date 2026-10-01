@@ -8,7 +8,7 @@ A small Windows app that tracks your screen time and focus. It lives in the syst
 records which app you're using, sorts each one into **Focus**, **Neutral** or **Distraction**, and
 gives you a daily **Locked In Score** from 0 to 100 that says how focused you really were.
 
-![The Locked In window showing today's score, stats and stage of locked in (demo data)](docs/screenshot.png)
+![The Locked In window on demo data: a score of 85, the Locked in stage, and today's time per app with Chrome split between focus and distraction](docs/screenshot.png)
 
 ## Features
 
