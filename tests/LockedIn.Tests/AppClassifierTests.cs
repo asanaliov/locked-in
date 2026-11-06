@@ -36,6 +36,12 @@ public sealed class AppClassifierTests
         Assert.Equal(expected, _classifier.Classify(appName, "any title").Category);
 
     [Theory]
+    [InlineData("GitHub Copilot tutorial - YouTube - Google Chrome", Category.Distraction)]
+    [InlineData("youtube-dl: download videos - GitHub - Google Chrome", Category.Focus)]
+    public void The_site_name_at_the_end_of_the_title_wins_over_earlier_keywords(string title, Category expected) =>
+        Assert.Equal(expected, _classifier.Classify("chrome", title).Category);
+
+    [Theory]
     [InlineData("Funny cats - YouTube - Google Chrome", Category.Distraction)]
     [InlineData("Locked In · GitHub - Google Chrome", Category.Focus)]
     [InlineData("New Tab - Google Chrome", Category.Neutral)]

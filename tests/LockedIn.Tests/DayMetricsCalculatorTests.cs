@@ -18,6 +18,17 @@ public sealed class DayMetricsCalculatorTests
         Assert.Equal(0, metrics.FocusRatio);
     }
 
+    [Theory]
+    [InlineData(10, 10)] // zero length
+    [InlineData(10, 5)] // the system clock was moved back during the session
+    public void Session_without_a_positive_length_is_ignored(double start, double end)
+    {
+        var metrics = DayMetricsCalculator.Calculate([At(0, 5, Focus), At(start, end, Focus, "other")], Tolerance);
+
+        Assert.Equal(TimeSpan.FromMinutes(5), metrics.ActiveTime);
+        Assert.Equal("app", Assert.Single(metrics.Apps).AppName);
+    }
+
     [Fact]
     public void Sums_time_per_category_and_app()
     {
