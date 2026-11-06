@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LockedIn.Linux.Views.SettingsPage">
+    <UserControl.Styles>
+        <Style Selector="Grid.setting">
+            <Setter Property="Margin" Value="0,8" />
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel>
+        <TextBlock Text="Settings" Classes="pageTitle" />
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Appearance" Classes="cardTitle" />
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Theme" Classes="settingName" />
+                        <TextBlock Text="System follows your desktop's light or dark mode." Classes="muted" />
+                    </StackPanel>
+                    <ContentControl Name="ThemeChoice" Grid.Column="1" VerticalAlignment="Center" />
+                </Grid>
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Accent colour" Classes="settingName" />
+                        <TextBlock Text="Used for the score ring, charts and highlights." Classes="muted" />
+                    </StackPanel>
+                    <StackPanel Name="AccentChoice" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" />
+                </Grid>
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Animations" Classes="settingName" />
+                        <TextBlock Text="Turn off to show everything instantly." Classes="muted" />
+                    </StackPanel>
+                    <CheckBox Name="Animations" Grid.Column="1" Classes="switch" VerticalAlignment="Center" Click="OnChanged" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Tracking" Classes="cardTitle" />
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Start at login" Classes="settingName" />
+                        <TextBlock Text="Starts quietly in the background when you log in." Classes="muted" />
+                    </StackPanel>
+                    <CheckBox Name="StartAtLogin" Grid.Column="1" Classes="switch" VerticalAlignment="Center" Click="OnStartAtLogin" />
+                </Grid>
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Stop counting after" Classes="settingName" />
+                        <TextBlock Text="How long without keyboard or mouse input before you count as away." Classes="muted" />
+                    </StackPanel>
+                    <ContentControl Name="IdleChoice" Grid.Column="1" VerticalAlignment="Center" />
+                </Grid>
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Save window titles" Classes="settingName" />
+                        <TextBlock Text="Off keeps titles private: they're only used to sort browser tabs and are never saved." Classes="muted" />
+                    </StackPanel>
+                    <CheckBox Name="StoreTitles" Grid.Column="1" Classes="switch" VerticalAlignment="Center" Click="OnChanged" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Locked In Score" Classes="cardTitle" />
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Streak break allowance" Classes="settingName" />
+                        <TextBlock Text="Breaks shorter than this, like a quick look at chat, don't end a deep work streak." Classes="muted" />
+                    </StackPanel>
+                    <ContentControl Name="StreakChoice" Grid.Column="1" VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Updates" Classes="cardTitle" />
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Text="Check for updates" Classes="settingName" />
+                        <TextBlock Text="Once a day, asks GitHub whether a newer version is out. Nothing about you or your usage is sent." Classes="muted" />
+                    </StackPanel>
+                    <CheckBox Name="CheckForUpdates" Grid.Column="1" Classes="switch" VerticalAlignment="Center" Click="OnChanged" />
+                </Grid>
+                <Grid Classes="setting" ColumnDefinitions="*,Auto">
+                    <StackPanel Margin="0,0,16,0">
+                        <TextBlock Name="VersionText" Classes="settingName" />
+                        <TextBlock Name="UpdateStatus" Classes="muted" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Name="CheckNow" Content="Check now" Classes="quiet" Click="OnCheckNow" />
+                        <Button Name="Download" Classes="quiet accent" Margin="8,0,0,0" IsVisible="False" Click="OnDownload" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="App categories" Classes="cardTitle" />
+                <TextBlock Classes="muted" Margin="0,0,0,12"
+                           Text="Changing a category also updates that app's past sessions. Browsers are classified per tab title using the keywords in lockedin.json; their setting only applies when no keyword matches." />
+                <ItemsControl Name="Categories" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

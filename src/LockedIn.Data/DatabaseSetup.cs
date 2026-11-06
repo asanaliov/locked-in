@@ -7,7 +7,9 @@ namespace LockedIn.Data;
 
 public static class DatabaseSetup
 {
-    private const string DefaultPath = @"%LOCALAPPDATA%\LockedIn\data.db";
+    /// <summary>%LOCALAPPDATA%\LockedIn on Windows, ~/.local/share/LockedIn on Linux.</summary>
+    private static string DefaultPath =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LockedIn", "data.db");
 
     public static IServiceCollection AddLockedInDatabase(this IServiceCollection services, IConfiguration configuration)
     {

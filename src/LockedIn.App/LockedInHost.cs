@@ -1,6 +1,6 @@
-using LockedIn.App.Services;
+using LockedIn.Core.Services;
 using LockedIn.App.Tray;
-using LockedIn.App.Updates;
+using LockedIn.Core.Updates;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using LockedIn.Tracker;
@@ -23,6 +23,9 @@ internal static class LockedInHost
         // No console in a tray app; only warnings and errors go to the Windows event log.
         builder.Logging.ClearProviders();
         builder.Logging.AddEventLog();
+
+        // By default a background service that throws stops the host, which would end tracking while the tray icon stays up.
+        builder.Services.Configure<HostOptions>(options => options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
 
         builder.Services.Configure<MetricsOptions>(builder.Configuration.GetSection(MetricsOptions.SectionName));
         builder.Services.Configure<AppearanceOptions>(builder.Configuration.GetSection(AppearanceOptions.SectionName));

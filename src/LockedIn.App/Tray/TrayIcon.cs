@@ -4,7 +4,8 @@ using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
 using LockedIn.App.Theming;
-using LockedIn.App.Updates;
+using LockedIn.Core.Services;
+using LockedIn.Core.Updates;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using Microsoft.Extensions.DependencyInjection;
@@ -100,7 +101,8 @@ internal sealed class TrayIcon : IDisposable
         _updateItem.Text = "Downloading update…";
         try
         {
-            await _updates.InstallAsync(update); // exits the app once the installer has started
+            await _updates.InstallAsync(update);
+            Application.Current.Shutdown(); // the installer waits for this
         }
         catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException)
         {

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Locked In
+Comment=Tracks your screen time and focus
+Exec=locked-in
+Icon=locked-in
+Terminal=false
+Categories=Utility;
+StartupWMClass=locked-in

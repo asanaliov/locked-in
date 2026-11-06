@@ -154,6 +154,23 @@ public sealed class SessionTrackerTests
         Assert.Equal(lastTick, saved.EndTime);
     }
 
+    [Fact]
+    public async Task Short_sleep_is_not_counted_even_with_a_long_idle_threshold()
+    {
+        _options.IdleThreshold = TimeSpan.FromMinutes(15);
+        var tracker = CreateTracker();
+        _windows.Current = new ActiveWindow("rider64", "Program.cs");
+        await TickAsync(tracker, times: 2);
+        var lastTick = _clock.UtcNow - Poll;
+
+        _clock.Advance(TimeSpan.FromMinutes(10)); // lid closed, then opened again
+        _idle.IdleTime = TimeSpan.FromMinutes(10);
+        await tracker.TickAsync(CancellationToken.None);
+
+        var saved = Assert.Single(_store.Saved);
+        Assert.Equal(lastTick, saved.EndTime);
+    }
+
     [Theory]
     [InlineData(false, null)]
     [InlineData(true, "Program.cs")]

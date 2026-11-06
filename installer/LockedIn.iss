@@ -53,7 +53,8 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopico
 
 [Registry]
 ; Same value the tray menu's "Start with Windows" writes (StartupRegistration.cs).
-Root: HKCU; Subkey: "{#RunKey}"; ValueType: string; ValueName: "LockedIn"; ValueData: """{app}\{#AppExe}"" --tray"; Tasks: startup
+; Not on an update: the task remembers the first install's choice, which would undo turning it off in the tray.
+Root: HKCU; Subkey: "{#RunKey}"; ValueType: string; ValueName: "LockedIn"; ValueData: """{app}\{#AppExe}"" --tray"; Tasks: startup; Check: not IsUpdate
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent

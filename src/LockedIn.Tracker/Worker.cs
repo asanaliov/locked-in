@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using LockedIn.Tracker.Sessions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,8 @@ public sealed class Worker(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        SystemEvents.SessionEnding += OnSessionEnding;
+        if (OperatingSystem.IsWindows())
+            SystemEvents.SessionEnding += OnSessionEnding;
 
         using var timer = new PeriodicTimer(options.Value.PollInterval);
         do
@@ -32,12 +34,14 @@ public sealed class Worker(
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        SystemEvents.SessionEnding -= OnSessionEnding;
+        if (OperatingSystem.IsWindows())
+            SystemEvents.SessionEnding -= OnSessionEnding;
         await base.StopAsync(cancellationToken);
         await tracker.FlushAsync(CancellationToken.None);
     }
 
     /// <summary>Logoff or shutdown may kill us before a normal stop, so save the current session right away.</summary>
+    [SupportedOSPlatform("windows")]
     private void OnSessionEnding(object? sender, SessionEndingEventArgs e) =>
         tracker.FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
 }

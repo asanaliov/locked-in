@@ -1,6 +1,5 @@
 {
   "LockedIn": {
-    "DatabasePath": "%LOCALAPPDATA%\\LockedIn\\data.db",
     "Tracker": {
       "PollInterval": "00:00:03",
       "IdleThreshold": "00:02:00",
@@ -13,7 +12,10 @@
       "CheckAutomatically": true
     },
     "Categories": {
-      "Browsers": [ "chrome", "msedge", "firefox", "brave", "opera", "vivaldi", "arc" ],
+      "Browsers": [
+        "chrome", "msedge", "firefox", "brave", "opera", "vivaldi", "arc",
+        "google-chrome", "chromium", "chromium-browser", "microsoft-edge", "brave-browser", "vivaldi-stable", "firefox-esr", "librewolf", "zen"
+      ],
       "Apps": {
         "rider64": "Focus",
         "devenv": "Focus",
@@ -29,7 +31,37 @@
         "cmd": "Focus",
         "notepad++": "Focus",
         "sublime_text": "Focus",
+        "code-oss": "Focus",
+        "VSCodium": "Focus",
+        "jetbrains-rider": "Focus",
+        "jetbrains-idea": "Focus",
+        "jetbrains-idea-ce": "Focus",
+        "jetbrains-pycharm": "Focus",
+        "jetbrains-pycharm-ce": "Focus",
+        "jetbrains-webstorm": "Focus",
+        "jetbrains-datagrip": "Focus",
+        "gnome-terminal-server": "Focus",
+        "org.gnome.Terminal": "Focus",
+        "org.gnome.Console": "Focus",
+        "kgx": "Focus",
+        "konsole": "Focus",
+        "Alacritty": "Focus",
+        "kitty": "Focus",
+        "wezterm": "Focus",
+        "org.wezfurlong.wezterm": "Focus",
+        "foot": "Focus",
+        "tilix": "Focus",
+        "xfce4-terminal": "Focus",
+        "XTerm": "Focus",
+        "URxvt": "Focus",
         "explorer": "Neutral",
+        "org.gnome.Nautilus": "Neutral",
+        "Nautilus": "Neutral",
+        "dolphin": "Neutral",
+        "Thunar": "Neutral",
+        "Nemo": "Neutral",
+        "gnome-control-center": "Neutral",
+        "org.gnome.Settings": "Neutral",
         "SystemSettings": "Neutral",
         "ApplicationFrameHost": "Neutral",
         "Taskmgr": "Neutral",
@@ -37,6 +69,8 @@
         "steam": "Distraction",
         "steamwebhelper": "Distraction",
         "Telegram": "Distraction",
+        "TelegramDesktop": "Distraction",
+        "org.telegram.desktop": "Distraction",
         "WhatsApp": "Distraction"
       },
       "TitleKeywords": {

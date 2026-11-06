@@ -2,7 +2,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using LockedIn.App.Controls;
-using LockedIn.App.Services;
+using LockedIn.Core.Services;
 using LockedIn.App.Theming;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;

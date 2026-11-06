@@ -1,4 +1,4 @@
-using LockedIn.App.Updates;
+using LockedIn.Core.Updates;
 
 namespace LockedIn.Tests;
 
@@ -24,9 +24,22 @@ public sealed class ReleaseFeedTests
     }
 
     [Fact]
+    public void Linux_finds_its_own_download_and_not_the_windows_installer()
+    {
+        var both = Release("v0.4.0", assetName: "locked-in-{0}-linux-x64.tar.gz");
+
+        var update = ReleaseFeed.Parse(both, Current, ReleasePlatform.Linux);
+
+        Assert.NotNull(update);
+        Assert.EndsWith("/locked-in-0.4.0-linux-x64.tar.gz", update.InstallerUrl.AbsoluteUri);
+        Assert.Null(ReleaseFeed.Parse(both, Current, ReleasePlatform.Windows));
+        Assert.Null(ReleaseFeed.Parse(Release("v0.4.0"), Current, ReleasePlatform.Linux));
+    }
+
+    [Fact]
     public void Newer_release_offers_its_installer()
     {
-        var update = ReleaseFeed.Parse(Release("v0.4.0"), Current);
+        var update = ReleaseFeed.Parse(Release("v0.4.0"), Current, ReleasePlatform.Windows);
 
         Assert.NotNull(update);
         Assert.Equal(new Version(0, 4, 0), update.Version);
@@ -38,17 +51,35 @@ public sealed class ReleaseFeedTests
     [InlineData("v0.3")]
     [InlineData("v0.2.9")]
     public void Same_or_older_release_is_not_an_update(string tag) =>
-        Assert.Null(ReleaseFeed.Parse(Release(tag), Current));
+        Assert.Null(ReleaseFeed.Parse(Release(tag), Current, ReleasePlatform.Windows));
 
     [Fact]
     public void Installer_hosted_anywhere_else_is_ignored() =>
-        Assert.Null(ReleaseFeed.Parse(Release("v0.4.0", url: "https://example.com/locked-in-setup-0.4.0.exe"), Current));
+        Assert.Null(ReleaseFeed.Parse(Release("v0.4.0", url: "https://example.com/locked-in-setup-0.4.0.exe"), Current, ReleasePlatform.Windows));
 
     [Fact]
     public void Release_without_an_installer_is_ignored() =>
-        Assert.Null(ReleaseFeed.Parse(Release("v0.4.0", assetName: "LockedIn-{0}.zip"), Current));
+        Assert.Null(ReleaseFeed.Parse(Release("v0.4.0", assetName: "LockedIn-{0}.zip"), Current, ReleasePlatform.Windows));
 
     [Fact]
     public void Tag_that_is_not_a_version_is_ignored() =>
-        Assert.Null(ReleaseFeed.Parse(Release("nightly"), Current));
+        Assert.Null(ReleaseFeed.Parse(Release("nightly"), Current, ReleasePlatform.Windows));
+
+    [Fact]
+    public void Two_part_tag_can_be_shown_as_a_three_part_version()
+    {
+        var update = ReleaseFeed.Parse(Release("v0.5"), Current, ReleasePlatform.Windows);
+
+        Assert.NotNull(update);
+        Assert.Equal("0.5.0", update.Version.ToString(3));
+    }
+
+    [Theory]
+    [InlineData("""{ "tag_name": 5 }""")]
+    [InlineData("""{ "tag_name": "v9.0.0", "assets": {} }""")]
+    [InlineData("""{ "tag_name": "v9.0.0", "assets": [ { "size": 1 } ] }""")]
+    [InlineData("""{ "tag_name": "v9.0.0", "assets": [ { "name": 1, "browser_download_url": 2 } ] }""")]
+    [InlineData("[]")]
+    public void Unexpected_answer_is_not_an_update(string json) =>
+        Assert.Null(ReleaseFeed.Parse(json, Current, ReleasePlatform.Windows));
 }
