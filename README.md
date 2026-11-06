@@ -4,7 +4,7 @@
 
 [![build](https://github.com/asanaliov/locked-in/actions/workflows/build.yml/badge.svg)](https://github.com/asanaliov/locked-in/actions/workflows/build.yml)
 
-A small Windows app that tracks your screen time and focus. It lives in the system tray, quietly
+A small Windows and Linux app that tracks your screen time and focus. It lives in the system tray, quietly
 records which app you're using, sorts each one into **Focus**, **Neutral** or **Distraction**, and
 gives you a daily **Locked In Score** from 0 to 100 that says how focused you really were.
 
@@ -67,9 +67,30 @@ and settings are kept.
 The check is a single request to GitHub with nothing about you or your usage in it. You can turn it
 off under **Settings → Updates** and use **Check now** whenever you like.
 
+## Install on Linux
+
+From the [latest release](https://github.com/asanaliov/locked-in/releases/latest), on x64:
+
+- **Debian or Ubuntu:** download `locked-in_x.y.z_amd64.deb` and run `sudo apt install ./locked-in_x.y.z_amd64.deb`.
+- **Any other distribution:** download `locked-in-x.y.z-linux-x64.tar.gz`, unpack it and run `./install.sh`. It installs
+  for your user only. You need `libX11`, `libXss` and `fontconfig`, which most desktops already have.
+
+Your data is in `~/.local/share/LockedIn`. Locked In tells you when a new version is out, but on Linux you
+download and install it yourself.
+
+**Limits on Linux:**
+
+- **Wayland:** full tracking needs an X11 (Xorg) session. Wayland doesn't let apps see which window has focus, so
+  on Wayland only apps running through XWayland are counted, and the Today page says so.
+- **Tray icon:** it needs a desktop with a tray. Plain GNOME needs the AppIndicator extension. Without a tray, open
+  the app again to get its window back, and use the **quit** link at the bottom of the window to exit.
+- **App icons:** apps show their first letter instead of their real icon.
+
 ## Build from source
 
-You need Windows 10 or 11 and the [.NET 10 SDK](https://dotnet.microsoft.com/download).
+You need the [.NET 10 SDK](https://dotnet.microsoft.com/download). The Windows app needs Windows 10 or 11.
+On Linux, use `dotnet run --project src/LockedIn.Linux` and `dotnet test tests/LockedIn.Tests`,
+and `packaging/linux/build-packages.sh x.y.z` builds the packages.
 
 ```bash
 git clone https://github.com/asanaliov/locked-in.git
@@ -95,7 +116,7 @@ iscc /DAppVersion=0.4.2 installer/LockedIn.iss
 ```
 
 Pushing a `v*` tag runs the [release workflow](.github/workflows/release.yml), which builds the
-installer and attaches it to the GitHub release.
+Windows installer and Linux packages and attaches them to the GitHub release.
 
 ## Configuration
 
@@ -129,6 +150,8 @@ LockedIn.sln
 │   │   ├── Controls/        Hand-drawn score ring, bars and column chart
 │   │   ├── Services/        Reads metrics and saves settings for the pages
 │   │   └── Theming/         Light and dark palettes, accents and animations
+│   ├── LockedIn.Linux/      locked-in: the same window and tray icon for Linux, in Avalonia
+│   ├── LockedIn.Core/       Page metrics, saved settings and update checks, shared by both apps
 │   ├── LockedIn.Data/       EF Core DbContext, entities and migrations (SQLite),
 │   │                        classification rules, metrics and the score calculator
 │   ├── LockedIn.Tracker/    Background tracking: polling, idle detection, session saving
@@ -174,7 +197,8 @@ Closing the window frees it; the tooltip only reads your score when you hover th
 - [ ] Pick any day on the Today page
 - [ ] CSV export
 - [ ] Code-signed installer and a winget package
-- [ ] macOS and Linux support
+- [ ] Full Wayland tracking on Linux
+- [ ] macOS support
 
 ## Author
 

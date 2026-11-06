@@ -1,0 +1,42 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:LockedIn.Linux.Controls"
+             x:Class="LockedIn.Linux.App"
+             Name="Locked In">
+    <Application.Resources>
+        <!-- Colours are filled in by ThemeManager; these are just the light defaults for the designer. -->
+        <SolidColorBrush x:Key="Bg" Color="#F5F5F7" />
+        <SolidColorBrush x:Key="Card" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="Raised" Color="#1F767680" />
+        <SolidColorBrush x:Key="Text" Color="#1D1D1F" />
+        <SolidColorBrush x:Key="Muted" Color="#6E6E73" />
+        <SolidColorBrush x:Key="Border" Color="#14000000" />
+        <SolidColorBrush x:Key="Accent" Color="#0071E3" />
+        <SolidColorBrush x:Key="OnAccent" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="AccentSoft" Color="#260071E3" />
+        <SolidColorBrush x:Key="Focus" Color="#34C759" />
+        <SolidColorBrush x:Key="Neutral" Color="#AEAEB2" />
+        <SolidColorBrush x:Key="Distraction" Color="#FF3B30" />
+
+        <!-- One app: icon, name, a bar scaled to the longest app, and its time. Shared by Today, Screen time and Top apps. -->
+        <DataTemplate x:Key="AppRow">
+            <Grid Margin="0,5" Background="Transparent" ToolTip.Tip="{Binding ExactTime}" ColumnDefinitions="44,180,*,90">
+                <c:AppIconView AppName="{Binding AppName}" Category="{Binding Category}" HorizontalAlignment="Left" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock Text="{Binding AppName}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Sub}" Classes="muted" FontSize="12" IsVisible="{Binding HasSub}" />
+                </StackPanel>
+                <c:SegmentBar Grid.Column="2" Height="8" VerticalAlignment="Center" Segments="{Binding Bar}" Total="{Binding Total}" />
+                <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding Time}" FontWeight="Medium" HorizontalAlignment="Right" />
+                    <TextBlock Text="{Binding Detail}" Classes="muted" FontSize="12" HorizontalAlignment="Right" IsVisible="{Binding HasDetail}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://locked-in/Styles.axaml" />
+    </Application.Styles>
+</Application>

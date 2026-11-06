@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="LockedIn.Linux.MainWindow"
+        Title="Locked In" Width="1020" Height="860" MinWidth="600" MinHeight="460"
+        Icon="avares://locked-in/Assets/logo.png"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Bg}" Foreground="{DynamicResource Text}" FontSize="14">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1" Padding="0,8">
+            <Grid MaxWidth="960" Margin="24,0">
+                <StackPanel Name="Nav" Orientation="Horizontal" Margin="-16,0,0,0">
+                    <RadioButton Content="Today" Tag="Today" GroupName="Nav" Classes="nav" />
+                    <RadioButton Content="Screen time" Tag="ScreenTime" GroupName="Nav" Classes="nav" />
+                    <RadioButton Content="Last 7 days" Tag="History" GroupName="Nav" Classes="nav" />
+                    <RadioButton Content="Top apps" Tag="Apps" GroupName="Nav" Classes="nav" />
+                    <RadioButton Content="Settings" Tag="Settings" GroupName="Nav" Classes="nav" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="960" Margin="24,24,24,16">
+                <ContentControl Name="Page" HorizontalContentAlignment="Stretch" />
+                <WrapPanel Margin="2,10,0,0">
+                    <TextBlock Classes="muted" FontSize="12" Text="All data stays on this machine.  ·  " />
+                    <TextBlock Name="Version" Classes="muted" FontSize="12" />
+                    <TextBlock Classes="muted" FontSize="12" Text="  ·  made by " />
+                    <Button Classes="link" Content="Asan" Tag="https://github.com/asanaliov" Click="OnLink" />
+                    <TextBlock Classes="muted" FontSize="12" Text="  ·  " />
+                    <Button Classes="link" Content="source" Tag="https://github.com/asanaliov/locked-in" Click="OnLink" />
+                    <TextBlock Classes="muted" FontSize="12" Text="  ·  " />
+                    <Button Classes="link" Content="quit" Click="OnQuit" />
+                </WrapPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

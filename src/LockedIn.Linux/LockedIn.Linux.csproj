@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- locked-in: the Linux app. An Avalonia window and tray icon on the same tracker, data and services as Windows. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>locked-in</AssemblyName>
+    <RootNamespace>LockedIn.Linux</RootNamespace>
+    <Product>Locked In</Product>
+    <AssemblyTitle>Locked In</AssemblyTitle>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <!-- Windows and pages take their services in the constructor; nothing loads them by URI. -->
+    <NoWarn>$(NoWarn);AVLN3001</NoWarn>
+    <!-- Same battery and memory choices as the Windows app. -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- The app is English only, and this drops the need for a matching libicu on every distribution. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="..\LockedIn.App\Assets\*.png" Link="Assets\%(Filename)%(Extension)" />
+    <AvaloniaResource Include="..\..\docs\logo\logo.png" Link="Assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LockedIn.Core\LockedIn.Core.csproj" />
+    <ProjectReference Include="..\LockedIn.Data\LockedIn.Data.csproj" />
+    <ProjectReference Include="..\LockedIn.Tracker\LockedIn.Tracker.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,113 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:LockedIn.Linux.Controls"
+             x:Class="LockedIn.Linux.Views.TodayPage">
+    <StackPanel>
+        <TextBlock Text="{Binding Date}" Classes="muted" FontSize="14" />
+        <TextBlock Text="Today" Classes="pageTitle" />
+
+        <Border Classes="card" IsVisible="{Binding IsWayland}" BorderBrush="{DynamicResource Accent}">
+            <StackPanel>
+                <TextBlock Text="Tracking is limited on Wayland" FontWeight="SemiBold" />
+                <TextBlock Classes="muted" Margin="0,4,0,0"
+                           Text="Wayland doesn't let apps see which window is focused, so only apps running through XWayland are counted and native Wayland apps are missing here. To track everything, choose an Xorg session on your login screen." />
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <Grid ColumnDefinitions="Auto,*">
+                <Grid Width="180" Height="180" Margin="4,4,36,4">
+                    <c:ScoreRing Name="Ring" />
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding #Ring.Value, StringFormat='{}{0:0}'}" FontSize="52" FontWeight="Bold" HorizontalAlignment="Center" />
+                        <TextBlock Text="Locked In Score" Classes="muted" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+                <UniformGrid Grid.Column="1" Columns="2" VerticalAlignment="Center">
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding ActiveTime}" Classes="statValue" />
+                        <TextBlock Text="Active time" Classes="muted" />
+                    </StackPanel>
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding FocusRatio}" Classes="statValue" />
+                        <TextBlock Text="Focus ratio" Classes="muted" />
+                    </StackPanel>
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding LongestStreak}" Classes="statValue" />
+                        <TextBlock Text="Longest streak" Classes="muted" />
+                    </StackPanel>
+                    <StackPanel Margin="0,8">
+                        <TextBlock Text="{Binding SwitchesPerHour}" Classes="statValue" />
+                        <TextBlock Text="Switches / hour" Classes="muted" />
+                    </StackPanel>
+                </UniformGrid>
+            </Grid>
+        </Border>
+
+        <Border Classes="card" Padding="32" IsVisible="{Binding IsEmpty}">
+            <StackPanel HorizontalAlignment="Center">
+                <Image Source="{Binding EmptyImage}" Width="320" Margin="0,0,0,20" />
+                <TextBlock Text="Nothing tracked yet today" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" />
+                <TextBlock Text="Pondering where to start? Open an app and get going. Your day shows up here as you work."
+                           Classes="muted" TextAlignment="Center" MaxWidth="340" Margin="0,4,0,0" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel IsVisible="{Binding HasData}">
+            <Border Classes="card">
+                <StackPanel>
+                    <TextBlock Text="Stage of locked in" Classes="cardTitle" />
+                    <TextBlock Text="{Binding StageName}" FontSize="24" FontWeight="Bold" Margin="0,-4,0,14" />
+                    <ItemsControl ItemsSource="{Binding Stages}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,10,0" Opacity="{Binding Opacity}">
+                                    <Border CornerRadius="12" BorderThickness="2" BorderBrush="{Binding Outline}" ClipToBounds="True">
+                                        <Image Source="{Binding Image}" Stretch="UniformToFill" />
+                                    </Border>
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,8,0,0" />
+                                    <TextBlock Text="{Binding Range}" Classes="muted" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel>
+                    <TextBlock Text="Breakdown" Classes="cardTitle" />
+                    <c:SegmentBar Height="12" Segments="{Binding Breakdown}" />
+                    <ItemsControl ItemsSource="{Binding Legend}" Margin="0,12,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,22,0">
+                                    <Ellipse Width="8" Height="8" Fill="{Binding Brush}" Margin="0,0,7,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Name}" Margin="0,0,5,0" />
+                                    <TextBlock Text="{Binding Time}" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel>
+                    <TextBlock Text="Time per app" Classes="cardTitle" />
+                    <ItemsControl ItemsSource="{Binding Apps}" ItemTemplate="{StaticResource AppRow}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

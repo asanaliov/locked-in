@@ -1,4 +1,4 @@
-namespace LockedIn.App.Updates;
+namespace LockedIn.Core.Updates;
 
 public sealed class UpdateOptions
 {

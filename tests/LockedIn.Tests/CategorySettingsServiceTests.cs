@@ -1,4 +1,4 @@
-using LockedIn.App.Services;
+using LockedIn.Core.Services;
 using LockedIn.Data;
 using LockedIn.Data.Classification;
 using Microsoft.Data.Sqlite;
