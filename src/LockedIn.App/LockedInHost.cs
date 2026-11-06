@@ -24,6 +24,9 @@ internal static class LockedInHost
         builder.Logging.ClearProviders();
         builder.Logging.AddEventLog();
 
+        // By default a background service that throws stops the host, which would end tracking while the tray icon stays up.
+        builder.Services.Configure<HostOptions>(options => options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
+
         builder.Services.Configure<MetricsOptions>(builder.Configuration.GetSection(MetricsOptions.SectionName));
         builder.Services.Configure<AppearanceOptions>(builder.Configuration.GetSection(AppearanceOptions.SectionName));
         builder.Services.AddLockedInDatabase(builder.Configuration);
