@@ -18,6 +18,8 @@ public sealed class SessionTracker(
     IAppIconCache icons,
     IOptionsMonitor<TrackerOptions> options) : ICurrentSessionSource
 {
+    private static readonly TimeSpan MinimumSleepGap = TimeSpan.FromSeconds(30);
+
     private UsageSession? _current;
     private DateTime? _lastTick;
 
@@ -25,8 +27,10 @@ public sealed class SessionTracker(
     {
         var now = clock.UtcNow;
 
-        // A long gap between ticks means the machine slept; the session ended when we stopped ticking.
-        if (_lastTick is { } lastTick && now - lastTick > options.CurrentValue.IdleThreshold)
+        // A gap between ticks means the machine slept; the session ended when we stopped ticking.
+        // Not tied to the idle threshold: with a 15 minute threshold, a 10 minute sleep would count as work.
+        var sleepGap = TimeSpan.FromTicks(Math.Max(MinimumSleepGap.Ticks, options.CurrentValue.PollInterval.Ticks * 5));
+        if (_lastTick is { } lastTick && now - lastTick > sleepGap)
             await CloseCurrentAsync(lastTick, cancellationToken);
         _lastTick = now;
 

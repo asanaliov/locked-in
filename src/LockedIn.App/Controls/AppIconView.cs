@@ -80,7 +80,7 @@ public sealed class AppIconView : Border
                 bitmap.Freeze();
                 icon = bitmap;
             }
-            catch (Exception ex) when (ex is IOException or NotSupportedException)
+            catch (Exception ex) when (ex is IOException or NotSupportedException or FormatException)
             {
                 // A broken icon file just falls back to the letter.
             }

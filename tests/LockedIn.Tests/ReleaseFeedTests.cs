@@ -51,4 +51,22 @@ public sealed class ReleaseFeedTests
     [Fact]
     public void Tag_that_is_not_a_version_is_ignored() =>
         Assert.Null(ReleaseFeed.Parse(Release("nightly"), Current));
+
+    [Fact]
+    public void Two_part_tag_can_be_shown_as_a_three_part_version()
+    {
+        var update = ReleaseFeed.Parse(Release("v0.5"), Current);
+
+        Assert.NotNull(update);
+        Assert.Equal("0.5.0", update.Version.ToString(3));
+    }
+
+    [Theory]
+    [InlineData("""{ "tag_name": 5 }""")]
+    [InlineData("""{ "tag_name": "v9.0.0", "assets": {} }""")]
+    [InlineData("""{ "tag_name": "v9.0.0", "assets": [ { "size": 1 } ] }""")]
+    [InlineData("""{ "tag_name": "v9.0.0", "assets": [ { "name": 1, "browser_download_url": 2 } ] }""")]
+    [InlineData("[]")]
+    public void Unexpected_answer_is_not_an_update(string json) =>
+        Assert.Null(ReleaseFeed.Parse(json, Current));
 }

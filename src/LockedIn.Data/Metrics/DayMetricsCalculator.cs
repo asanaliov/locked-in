@@ -5,7 +5,8 @@ public static class DayMetricsCalculator
     /// <summary>Computes metrics for the sessions of one period. Sessions must already be clipped to it.</summary>
     public static DayMetrics Calculate(IReadOnlyCollection<UsageSession> sessions, TimeSpan streakTolerance)
     {
-        var ordered = sessions.OrderBy(s => s.StartTime).ToList();
+        // Moving the system clock back can leave a session that ends before it starts.
+        var ordered = sessions.Where(s => s.Duration > TimeSpan.Zero).OrderBy(s => s.StartTime).ToList();
         var active = Sum(ordered);
         var focus = Sum(ordered.Where(s => s.Category == Category.Focus));
         var streak = StreakCalculator.LongestFocusStreak(ordered, streakTolerance);

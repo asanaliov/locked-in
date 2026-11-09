@@ -2,7 +2,9 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using LockedIn.App.Tray;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace LockedIn.App;
 
@@ -35,6 +37,16 @@ internal static class Program
         RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
         var app = new App();
         app.InitializeComponent();
+
+        // Pages load in async void event handlers, so one failed read or save would otherwise end the app and the tracking.
+        var logger = host.Services.GetRequiredService<ILogger<App>>();
+        app.DispatcherUnhandledException += (_, e) =>
+        {
+            logger.LogError(e.Exception, "Unhandled error in the window");
+            MessageBox.Show($"Something went wrong, but tracking is still running:\n\n{e.Exception.Message}", "Locked In", MessageBoxButton.OK, MessageBoxImage.Warning);
+            e.Handled = true;
+        };
+
         var startInTray = args.Contains(StartupRegistration.StartInTrayArgument);
         using (new TrayIcon(host.Services, instance, showWindow: !startInTray))
         {

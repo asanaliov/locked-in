@@ -1,4 +1,3 @@
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using LockedIn.Data;
@@ -70,7 +69,7 @@ public sealed class GeneralSettingsService(IConfiguration configuration, IOption
                 },
             },
         };
-        File.WriteAllText(SettingsFile.UserSettingsPath, json.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+        SettingsFile.WriteAtomically(SettingsFile.UserSettingsPath, json.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
 
         // Reload right away instead of waiting on a file watcher, so the redirect already shows the new values.
         ((IConfigurationRoot)configuration).Reload();

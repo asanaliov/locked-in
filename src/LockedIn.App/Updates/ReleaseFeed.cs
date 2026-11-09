@@ -16,11 +16,23 @@ public static class ReleaseFeed
     public static AvailableUpdate? Parse(string json, Version current)
     {
         using var document = JsonDocument.Parse(json);
-        var release = document.RootElement;
+        try
+        {
+            return Read(document.RootElement, current);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or KeyNotFoundException or UriFormatException)
+        {
+            return null; // valid JSON, but not the shape of a release
+        }
+    }
 
-        if (!release.TryGetProperty("tag_name", out var tag) || !Version.TryParse(tag.GetString()?.TrimStart('v'), out var version))
+    private static AvailableUpdate? Read(JsonElement release, Version current)
+    {
+        if (!release.TryGetProperty("tag_name", out var tag) || !Version.TryParse(tag.GetString()?.TrimStart('v'), out var parsed))
             return null;
-        if (Comparable(version) <= Comparable(current))
+
+        var version = Comparable(parsed);
+        if (version <= Comparable(current))
             return null;
         if (!release.TryGetProperty("assets", out var assets))
             return null;

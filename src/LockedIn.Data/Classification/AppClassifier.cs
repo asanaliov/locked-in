@@ -30,13 +30,23 @@ public sealed class AppClassifier(CategoryRules rules, ICategoryOverrides overri
         return new Classification(overrides.Find(appName) ?? rules.DefaultFor(appName), ByTitle: false);
     }
 
+    /// <summary>
+    /// Browsers put the site's name at the end of the title, so the keyword nearest the end decides:
+    /// "GitHub tutorial - YouTube" is YouTube, and "youtube-dl - GitHub" is GitHub.
+    /// </summary>
     private Category? MatchTitleKeyword(string windowTitle)
     {
+        Category? match = null;
+        var matchEnd = -1;
         foreach (var (keyword, category) in rules.TitleKeywords)
         {
-            if (windowTitle.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                return category;
+            var index = windowTitle.LastIndexOf(keyword, StringComparison.OrdinalIgnoreCase);
+            if (index >= 0 && index + keyword.Length > matchEnd)
+            {
+                match = category;
+                matchEnd = index + keyword.Length;
+            }
         }
-        return null;
+        return match;
     }
 }
