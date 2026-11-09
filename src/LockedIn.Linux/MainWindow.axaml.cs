@@ -31,6 +31,7 @@ public partial class MainWindow : Window
         Version.Text = $"v{UpdateService.CurrentVersion.ToString(3)}";
 
         FitToScreen();
+        Classes.Set("animated", ThemeManager.Animations);
         ThemeManager.Changed += OnThemeChanged;
         Closed += (_, _) => ThemeManager.Changed -= OnThemeChanged;
 
@@ -69,6 +70,7 @@ public partial class MainWindow : Window
     /// <summary>Charts and bars take their colours when drawn, so the page is rebuilt with the new palette.</summary>
     private async void OnThemeChanged()
     {
+        Classes.Set("animated", ThemeManager.Animations);
         if (_current != "Settings")
             await ShowPageAsync();
     }
