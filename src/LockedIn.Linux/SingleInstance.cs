@@ -10,7 +10,7 @@ internal sealed class SingleInstance : IDisposable
 {
     private static readonly string Folder = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR") is { Length: > 0 } runtime
         ? runtime
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LockedIn");
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), "LockedIn");
 
     private static string LockPath => Path.Combine(Folder, "locked-in.lock");
     private static string SocketPath => Path.Combine(Folder, "locked-in.sock");

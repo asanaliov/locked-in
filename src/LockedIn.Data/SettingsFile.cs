@@ -13,7 +13,7 @@ public static class SettingsFile
     public const string SectionName = "LockedIn";
 
     public static readonly string UserSettingsPath =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LockedIn", "settings.json");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), "LockedIn", "settings.json");
 
     /// <summary>
     /// A settings file that can't be read would stop the app, and so the tracking, from starting at all.

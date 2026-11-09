@@ -7,7 +7,7 @@ internal static class Autostart
     public const string StartInTrayArgument = "--tray";
 
     private static string FilePath =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "autostart", "locked-in.desktop");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create), "autostart", "locked-in.desktop");
 
     public static bool IsEnabled() => File.Exists(FilePath);
 
