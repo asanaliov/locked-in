@@ -4,7 +4,7 @@ namespace LockedIn.Data;
 public static class AppIconFiles
 {
     public static readonly string Folder =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LockedIn", "icons");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), "LockedIn", "icons");
 
     public static string PathFor(string appName)
     {

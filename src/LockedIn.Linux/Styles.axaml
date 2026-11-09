@@ -59,6 +59,10 @@
     <Style Selector="RadioButton.nav:checked /template/ Border#Pill">
         <Setter Property="Background" Value="{DynamicResource Raised}" />
     </Style>
+    <Style Selector="RadioButton.nav:pressed /template/ Border#Pill">
+        <Setter Property="Background" Value="{DynamicResource Raised}" />
+        <Setter Property="Opacity" Value="0.7" />
+    </Style>
 
     <!-- Segmented choices -->
     <Style Selector="RadioButton.segment">
@@ -95,7 +99,7 @@
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Name="Pill" Background="{TemplateBinding Background}" CornerRadius="8" Padding="14,6">
+                <Border Name="Pill" Background="{TemplateBinding Background}" CornerRadius="8" Padding="14,6" RenderTransform="scale(1)">
                     <ContentPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
@@ -104,6 +108,10 @@
     </Style>
     <Style Selector="Button.quiet:pointerover /template/ Border#Pill">
         <Setter Property="Opacity" Value="0.85" />
+    </Style>
+    <Style Selector="Button.quiet:pressed /template/ Border#Pill">
+        <Setter Property="Opacity" Value="0.7" />
+        <Setter Property="RenderTransform" Value="scale(0.97)" />
     </Style>
     <Style Selector="Button.quiet:disabled /template/ Border#Pill">
         <Setter Property="Opacity" Value="0.5" />
@@ -120,9 +128,15 @@
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <ControlTemplate>
-                <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" TextDecorations="Underline" />
+                <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
             </ControlTemplate>
         </Setter>
+    </Style>
+    <Style Selector="Button.link:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    </Style>
+    <Style Selector="Button.link:pointerover /template/ TextBlock">
+        <Setter Property="TextDecorations" Value="Underline" />
     </Style>
 
     <!-- Accent colour swatch -->
@@ -148,7 +162,8 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Name="Track" Width="44" Height="26" CornerRadius="13" Background="{DynamicResource Raised}">
-                    <Ellipse Name="Thumb" Width="20" Height="20" Fill="White" HorizontalAlignment="Left" Margin="3,0" />
+                    <Ellipse Name="Thumb" Width="20" Height="20" Fill="White" HorizontalAlignment="Left" Margin="3,0"
+                             RenderTransform="translateX(0px)" />
                 </Border>
             </ControlTemplate>
         </Setter>
@@ -156,8 +171,40 @@
     <Style Selector="CheckBox.switch:checked /template/ Border#Track">
         <Setter Property="Background" Value="{DynamicResource Accent}" />
     </Style>
+    <!-- Moved rather than re-aligned, so it can slide: 44 track - 20 thumb - 2 × 3 margin = 18. -->
     <Style Selector="CheckBox.switch:checked /template/ Ellipse#Thumb">
-        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="RenderTransform" Value="translateX(18px)" />
+    </Style>
+
+    <!-- Transitions, only while the Animations setting is on (MainWindow adds the class) -->
+    <Style Selector=".animated RadioButton.nav /template/ Border#Pill, .animated RadioButton.segment /template/ Border#Pill">
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector=".animated Button.quiet /template/ Border#Pill">
+        <Setter Property="Transitions">
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector=".animated CheckBox.switch /template/ Border#Track">
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.2" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector=".animated CheckBox.switch /template/ Ellipse#Thumb">
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut" />
+            </Transitions>
+        </Setter>
     </Style>
 
     <!-- Tooltips in the app's colours -->

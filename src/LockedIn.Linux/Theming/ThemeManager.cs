@@ -24,7 +24,7 @@ internal static class ThemeManager
     private static readonly Palette Dark = new("#000000", "#1C1C1E", "#3D767680", "#F5F5F7", "#98989D", "#1AFFFFFF", "#30D158", "#636366", "#FF453A");
 
     private static IOptionsMonitor<AppearanceOptions>? _options;
-    private static (bool Dark, Accent Accent)? _applied;
+    private static (bool Dark, Accent Accent, bool Animations)? _applied;
 
     /// <summary>Raised on the UI thread after the palette changed.</summary>
     public static event Action? Changed;
@@ -54,9 +54,9 @@ internal static class ThemeManager
             _ => Application.Current?.PlatformSettings?.GetColorValues().ThemeVariant == PlatformThemeVariant.Dark,
         };
 
-        if (_applied == (isDark, look.Accent))
+        if (_applied == (isDark, look.Accent, look.Animations))
             return;
-        _applied = (isDark, look.Accent);
+        _applied = (isDark, look.Accent, look.Animations);
 
         var palette = isDark ? Dark : Light;
         var (accent, onAccent) = (look.Accent, isDark) switch
