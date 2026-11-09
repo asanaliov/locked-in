@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:LockedIn.Linux.Controls"
+             x:Class="LockedIn.Linux.Views.HistoryPage">
+    <UserControl.Styles>
+        <Style Selector="TextBlock.num">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.head">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel>
+        <TextBlock Text="Last 7 days" Classes="pageTitle" />
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Active hours and Locked In Score" Classes="cardTitle" />
+                <c:ColumnChart Name="WeekChart" Height="280" />
+                <ItemsControl ItemsSource="{Binding Legend}" Margin="44,10,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,18,0">
+                                <Ellipse Width="8" Height="8" Fill="{Binding Brush}" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Name}" Classes="muted" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <Grid Margin="0,0,0,8" ColumnDefinitions="1.3*,0.6*,2*,*,*,*,*">
+                    <TextBlock Text="Day" Classes="head" />
+                    <TextBlock Grid.Column="1" Text="Score" Classes="head" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="2" Text="Stage" Classes="head" Margin="16,0,0,0" />
+                    <TextBlock Grid.Column="3" Text="Active" Classes="head" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="4" Text="Focus" Classes="head" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="5" Text="Distracted" Classes="head" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="6" Text="Streak" Classes="head" HorizontalAlignment="Right" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Days}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Padding="0,8">
+                                <Grid ColumnDefinitions="1.3*,0.6*,2*,*,*,*,*">
+                                    <TextBlock Text="{Binding Day}" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Score}" FontWeight="Bold" Classes="num" />
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="16,0,0,0">
+                                        <Border CornerRadius="5" ClipToBounds="True" Width="36" Height="25" Margin="0,0,8,0">
+                                            <Image Source="{Binding StageImage}" Stretch="UniformToFill" />
+                                        </Border>
+                                        <TextBlock Text="{Binding Stage}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="3" Text="{Binding Active}" Classes="num" />
+                                    <TextBlock Grid.Column="4" Text="{Binding Focus}" Classes="num" />
+                                    <TextBlock Grid.Column="5" Text="{Binding Distraction}" Classes="num" />
+                                    <TextBlock Grid.Column="6" Text="{Binding Streak}" Classes="num" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

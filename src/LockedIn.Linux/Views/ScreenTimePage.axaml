@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:LockedIn.Linux.Controls"
+             x:Class="LockedIn.Linux.Views.ScreenTimePage">
+    <StackPanel>
+        <TextBlock Text="Screen time" Classes="pageTitle" />
+
+        <Border Classes="card">
+            <Grid ColumnDefinitions="*,*,*">
+                <StackPanel>
+                    <TextBlock Text="{Binding Total}" FontSize="40" FontWeight="Bold" />
+                    <TextBlock Text="{Binding Comparison}" Classes="muted" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Average}" Classes="statValue" />
+                    <TextBlock Text="Daily average, last 7 days" Classes="muted" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding MostUsed}" Classes="statValue" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="Most used today" Classes="muted" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Today by hour" Classes="cardTitle" />
+                <c:ColumnChart Name="HoursChart" Height="190" />
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Last 7 days" Classes="cardTitle" />
+                <c:ColumnChart Name="WeekChart" Height="220" />
+                <TextBlock Text="Dashed line: your daily average" Classes="muted" FontSize="12" Margin="44,6,0,0" />
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Text="Apps today" Classes="cardTitle" />
+                <TextBlock Text="Nothing tracked yet today." Classes="muted" IsVisible="{Binding IsEmpty}" />
+                <ItemsControl ItemsSource="{Binding Apps}" ItemTemplate="{StaticResource AppRow}" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

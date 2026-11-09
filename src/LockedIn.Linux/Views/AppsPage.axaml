@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LockedIn.Linux.Views.AppsPage">
+    <StackPanel>
+        <TextBlock Text="Top apps" Classes="pageTitle" />
+
+        <Border Classes="segmentGroup" Margin="0,0,0,14">
+            <StackPanel Name="Periods" Orientation="Horizontal">
+                <RadioButton Content="Today" Tag="1" GroupName="Period" Classes="segment" />
+                <RadioButton Content="7 days" Tag="7" GroupName="Period" Classes="segment" IsChecked="True" />
+                <RadioButton Content="30 days" Tag="30" GroupName="Period" Classes="segment" />
+            </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+                <TextBlock Name="Empty" Text="No apps tracked in this period." Classes="muted" IsVisible="False" />
+                <ItemsControl Name="List" ItemTemplate="{StaticResource AppRow}" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

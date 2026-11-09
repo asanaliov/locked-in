@@ -5,8 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using LockedIn.App.Controls;
-using LockedIn.App.Services;
-using LockedIn.App.Updates;
+using LockedIn.Core.Services;
+using LockedIn.Core.Updates;
 using LockedIn.Data;
 
 namespace LockedIn.App.Views;
@@ -106,6 +106,7 @@ public partial class SettingsPage : UserControl, IPage
         try
         {
             await _updates.InstallAsync(update);
+            Application.Current.Shutdown(); // the installer waits for this
         }
         catch (Exception ex) when (ex is HttpRequestException or IOException or TaskCanceledException)
         {

@@ -1,5 +1,6 @@
 using LockedIn.Data;
 using LockedIn.Data.Classification;
+using LockedIn.Tracker.Linux;
 using LockedIn.Tracker.Sessions;
 using LockedIn.Tracker.Windows;
 using Microsoft.Extensions.Configuration;
@@ -16,8 +17,17 @@ public static class TrackerSetup
         services.AddSingleton(configuration.GetSection(CategoryRules.SectionName).Get<CategoryRules>() ?? new());
         services.AddSingleton<ICategoryOverrides, DbCategoryOverrides>();
         services.AddSingleton<IAppClassifier, AppClassifier>();
-        services.AddSingleton<IActiveWindowProvider, Win32ActiveWindowProvider>();
-        services.AddSingleton<IIdleDetector, Win32IdleDetector>();
+        if (OperatingSystem.IsWindows())
+        {
+            services.AddSingleton<IActiveWindowProvider, Win32ActiveWindowProvider>();
+            services.AddSingleton<IIdleDetector, Win32IdleDetector>();
+        }
+        else
+        {
+            services.AddSingleton<X11Connection>();
+            services.AddSingleton<IActiveWindowProvider, X11ActiveWindowProvider>();
+            services.AddSingleton<IIdleDetector, X11IdleDetector>();
+        }
         services.AddSingleton<IClock, SystemClock>();
         services.AddSingleton<ISessionStore, EfSessionStore>();
         services.AddSingleton<SessionTracker>();

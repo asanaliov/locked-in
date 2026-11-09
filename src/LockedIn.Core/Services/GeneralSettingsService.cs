@@ -4,7 +4,7 @@ using LockedIn.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace LockedIn.App.Services;
+namespace LockedIn.Core.Services;
 
 public sealed record GeneralSettings(
     Theme Theme,

@@ -1,6 +1,6 @@
-using LockedIn.App.Services;
+using LockedIn.Core.Services;
 using LockedIn.App.Tray;
-using LockedIn.App.Updates;
+using LockedIn.Core.Updates;
 using LockedIn.Data;
 using LockedIn.Data.Metrics;
 using LockedIn.Tracker;

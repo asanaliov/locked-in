@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -15,7 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\LockedIn.Data\LockedIn.Data.csproj" />
     <ProjectReference Include="..\..\src\LockedIn.Tracker\LockedIn.Tracker.csproj" />
-    <ProjectReference Include="..\..\src\LockedIn.App\LockedIn.App.csproj" />
+    <ProjectReference Include="..\..\src\LockedIn.Core\LockedIn.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

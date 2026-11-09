@@ -1,6 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
-using LockedIn.App.Services;
+using LockedIn.Core.Services;
 using LockedIn.App.Theming;
 
 namespace LockedIn.App.Views;
